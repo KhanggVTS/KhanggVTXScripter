@@ -1,0 +1,847 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Xóa GUI cũ nếu có
+for _, gui in pairs(playerGui:GetChildren()) do
+    if gui.Name == "DecoderGUI" then
+        gui:Destroy()
+    end
+end
+
+wait(0.1)
+
+-- Tạo ScreenGui chính
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DecoderGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.DisplayOrder = 999
+
+-- Frame chính
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.Size = UDim2.new(0, 500, 0, 350)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.Parent = ScreenGui
+-- Bo góc chính
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 16)
+UICorner.Parent = MainFrame
+
+-- Viền ngoài
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(60, 60, 80)
+UIStroke.Thickness = 2
+UIStroke.Transparency = 0.3
+UIStroke.Parent = MainFrame
+
+-- Thanh tiêu đề
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BorderSizePixel = 0
+TopBar.Parent = MainFrame
+
+local TopBarCorner = Instance.new("UICorner")
+TopBarCorner.CornerRadius = UDim.new(0, 16)
+TopBarCorner.Parent = TopBar
+
+-- Icon
+local TitleIcon = Instance.new("TextLabel")
+TitleIcon.BackgroundTransparency = 1
+TitleIcon.Position = UDim2.new(0, 12, 0.5, -10)
+TitleIcon.Size = UDim2.new(0, 20, 0, 20)
+TitleIcon.Font = Enum.Font.SourceSansBold
+TitleIcon.Text = "🔓"
+TitleIcon.TextColor3 = Color3.fromRGB(100, 255, 150)
+TitleIcon.TextSize = 18
+TitleIcon.Parent = TopBar
+
+-- Tiêu đề
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Position = UDim2.new(0, 38, 0, 0)
+TitleLabel.Size = UDim2.new(0, 200, 1, 0)
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.Text = "Universal Decoder"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 15
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TopBar
+
+-- Nút đóng
+local CloseButton = Instance.new("TextButton")
+CloseButton.AnchorPoint = Vector2.new(1, 0.5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+CloseButton.Position = UDim2.new(1, -12, 0.5, 0)
+CloseButton.Size = UDim2.new(0, 24, 0, 24)
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.Text = "✕"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+CloseButton.BorderSizePixel = 0
+CloseButton.AutoButtonColor = false
+CloseButton.Parent = TopBar
+
+local CloseUICorner = Instance.new("UICorner")
+CloseUICorner.CornerRadius = UDim.new(1, 0)
+CloseUICorner.Parent = CloseButton
+-- Frame bước 1
+local Step1Frame = Instance.new("Frame")
+Step1Frame.BackgroundTransparency = 1
+Step1Frame.Size = UDim2.new(1, 0, 1, -40)
+Step1Frame.Position = UDim2.new(0, 0, 0, 40)
+Step1Frame.Parent = MainFrame
+
+-- Tiêu đề bước 1
+local Step1Title = Instance.new("TextLabel")
+Step1Title.BackgroundTransparency = 1
+Step1Title.Position = UDim2.new(0, 15, 0, 15)
+Step1Title.Size = UDim2.new(1, -30, 0, 25)
+Step1Title.Font = Enum.Font.SourceSansBold
+Step1Title.Text = "Bước 1: Nhập Code Obfuscated"
+Step1Title.TextColor3 = Color3.fromRGB(200, 200, 210)
+Step1Title.TextSize = 14
+Step1Title.TextXAlignment = Enum.TextXAlignment.Left
+Step1Title.Parent = Step1Frame
+
+-- Khung code
+local CodeFrame = Instance.new("Frame")
+CodeFrame.AnchorPoint = Vector2.new(0.5, 0)
+CodeFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+CodeFrame.Position = UDim2.new(0.5, 0, 0, 50)
+CodeFrame.Size = UDim2.new(0, 470, 0, 180)
+CodeFrame.BorderSizePixel = 0
+CodeFrame.Parent = Step1Frame
+
+local CodeFrameCorner = Instance.new("UICorner")
+CodeFrameCorner.CornerRadius = UDim.new(0, 10)
+CodeFrameCorner.Parent = CodeFrame
+
+local CodeFrameStroke = Instance.new("UIStroke")
+CodeFrameStroke.Color = Color3.fromRGB(70, 70, 90)
+CodeFrameStroke.Thickness = 1
+CodeFrameStroke.Transparency = 0.5
+CodeFrameStroke.Parent = CodeFrame
+
+-- ScrollingFrame để scroll
+local CodeScrollFrame = Instance.new("ScrollingFrame")
+CodeScrollFrame.BackgroundTransparency = 1
+CodeScrollFrame.Position = UDim2.new(0, 8, 0, 8)
+CodeScrollFrame.Size = UDim2.new(1, -16, 1, -16)
+CodeScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+CodeScrollFrame.ScrollBarThickness = 4
+CodeScrollFrame.BorderSizePixel = 0
+CodeScrollFrame.Parent = CodeFrame
+
+-- TextBox nhập code
+local CodeBox = Instance.new("TextBox")
+CodeBox.BackgroundTransparency = 1
+CodeBox.Size = UDim2.new(1, 0, 1, 0)
+CodeBox.Font = Enum.Font.Code
+CodeBox.PlaceholderText = "Paste obfuscated code here..."
+CodeBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 120)
+CodeBox.Text = ""
+CodeBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+CodeBox.TextSize = 11
+CodeBox.TextXAlignment = Enum.TextXAlignment.Left
+CodeBox.TextYAlignment = Enum.TextYAlignment.Top
+CodeBox.ClearTextOnFocus = false
+CodeBox.MultiLine = true
+CodeBox.TextWrapped = true
+CodeBox.Parent = CodeScrollFrame
+-- Label chọn loại
+local ObfTypeLabel = Instance.new("TextLabel")
+ObfTypeLabel.BackgroundTransparency = 1
+ObfTypeLabel.Position = UDim2.new(0, 15, 0, 240)
+ObfTypeLabel.Size = UDim2.new(0, 150, 0, 25)
+ObfTypeLabel.Font = Enum.Font.SourceSansBold
+ObfTypeLabel.Text = "Loại Obfuscator:"
+ObfTypeLabel.TextColor3 = Color3.fromRGB(200, 200, 210)
+ObfTypeLabel.TextSize = 14
+ObfTypeLabel.TextXAlignment = Enum.TextXAlignment.Left
+ObfTypeLabel.Parent = Step1Frame
+
+-- Dropdown button
+local ObfTypeDropdown = Instance.new("TextButton")
+ObfTypeDropdown.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+ObfTypeDropdown.Position = UDim2.new(0, 15, 0, 265)
+ObfTypeDropdown.Size = UDim2.new(0, 200, 0, 35)
+ObfTypeDropdown.Font = Enum.Font.SourceSans
+ObfTypeDropdown.Text = "🔽 Auto Detect"
+ObfTypeDropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
+ObfTypeDropdown.TextSize = 14
+ObfTypeDropdown.BorderSizePixel = 0
+ObfTypeDropdown.Parent = Step1Frame
+
+local ObfTypeCorner = Instance.new("UICorner")
+ObfTypeCorner.CornerRadius = UDim.new(0, 8)
+ObfTypeCorner.Parent = ObfTypeDropdown
+
+-- Menu thả xuống
+local ObfTypeMenu = Instance.new("ScrollingFrame")
+ObfTypeMenu.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+ObfTypeMenu.Position = UDim2.new(0, 15, 0, 300)
+ObfTypeMenu.Size = UDim2.new(0, 200, 0, 0)
+ObfTypeMenu.Visible = false
+ObfTypeMenu.CanvasSize = UDim2.new(0, 0, 0, 0)
+ObfTypeMenu.ScrollBarThickness = 4
+ObfTypeMenu.BorderSizePixel = 0
+ObfTypeMenu.Parent = Step1Frame
+
+local ObfTypeMenuCorner = Instance.new("UICorner")
+ObfTypeMenuCorner.CornerRadius = UDim.new(0, 8)
+ObfTypeMenuCorner.Parent = ObfTypeMenu
+
+-- Danh sách obfuscator
+local ObfTypes = {
+    {name = "🔍 Auto Detect", value = "auto"},
+    {name = "🔒 LuaObfuscator", value = "luaobf"},
+    {name = "🌙 Moonsec v3", value = "moonsec"},
+    {name = "⚡ WeAreDevs", value = "wearedev"},
+    {name = "🛡️ Ferib", value = "ferib"},
+    {name = "🔧 IronBrew", value = "ironbrew"},
+    {name = "📦 Kocoscript", value = "kocoscript"},
+    {name = "❓ Unknown", value = "unknown"}
+}
+-- Tạo các item trong menu
+local obfTypeMenuItems = {}
+for i, obfType in ipairs(ObfTypes) do
+    local item = Instance.new("TextButton")
+    item.BackgroundTransparency = 1
+    item.Position = UDim2.new(0, 0, 0, (i-1) * 35)
+    item.Size = UDim2.new(1, 0, 0, 35)
+    item.Font = Enum.Font.SourceSans
+    item.Text = obfType.name
+    item.TextColor3 = Color3.fromRGB(200, 200, 210)
+    item.TextSize = 13
+    item.BorderSizePixel = 0
+    item.AutoButtonColor = false
+    item.Parent = ObfTypeMenu
+    obfTypeMenuItems[i] = item
+    
+    -- Hover effect
+    item.MouseEnter:Connect(function()
+        item.BackgroundTransparency = 0.8
+    end)
+    item.MouseLeave:Connect(function()
+        item.BackgroundTransparency = 1
+    end)
+    
+    -- Click chọn
+    item.MouseButton1Click:Connect(function()
+        ObfTypeDropdown.Text = obfType.name
+        ObfTypeMenu.Visible = false
+        ObfTypeMenu.Size = UDim2.new(0, 200, 0, 0)
+        selectedObfuscator = obfType.value
+    end)
+end
+
+ObfTypeMenu.CanvasSize = UDim2.new(0, 0, 0, #ObfTypes * 35)
+
+-- Mở/đóng menu
+ObfTypeDropdown.MouseButton1Click:Connect(function()
+    ObfTypeMenu.Visible = not ObfTypeMenu.Visible
+    if ObfTypeMenu.Visible then
+        ObfTypeMenu.Size = UDim2.new(0, 200, 0, math.min(175, #ObfTypes * 35))
+    else
+        ObfTypeMenu.Size = UDim2.new(0, 200, 0, 0)
+    end
+end)
+
+-- Hint label
+local HintLabel = Instance.new("TextLabel")
+HintLabel.BackgroundTransparency = 1
+HintLabel.Position = UDim2.new(0, 230, 0, 265)
+HintLabel.Size = UDim2.new(0, 250, 0, 35)
+HintLabel.Font = Enum.Font.SourceSans
+HintLabel.Text = "💡 Để Auto Detect, script sẽ tự nhận dạng"
+HintLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
+HintLabel.TextSize = 11
+HintLabel.TextXAlignment = Enum.TextXAlignment.Left
+HintLabel.TextWrapped = true
+HintLabel.Parent = Step1Frame
+-- Nút tiếp tục
+local NextButton = Instance.new("TextButton")
+NextButton.AnchorPoint = Vector2.new(1, 0)
+NextButton.BackgroundColor3 = Color3.fromRGB(100, 120, 255)
+NextButton.Position = UDim2.new(1, -15, 1, -15)
+NextButton.Size = UDim2.new(0, 120, 0, 35)
+NextButton.Font = Enum.Font.SourceSansBold
+NextButton.Text = "TIẾP TỤC →"
+NextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+NextButton.TextSize = 14
+NextButton.BorderSizePixel = 0
+NextButton.AutoButtonColor = false
+NextButton.Parent = Step1Frame
+
+local NextButtonCorner = Instance.new("UICorner")
+NextButtonCorner.CornerRadius = UDim.new(0, 8)
+NextButtonCorner.Parent = NextButton
+
+-- Gradient cho nút
+local NextButtonGradient = Instance.new("UIGradient")
+NextButtonGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 120, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 100, 255))
+}
+NextButtonGradient.Rotation = 45
+NextButtonGradient.Parent = NextButton
+-- Frame bước 2
+local Step2Frame = Instance.new("Frame")
+Step2Frame.BackgroundTransparency = 1
+Step2Frame.Size = UDim2.new(1, 0, 1, -40)
+Step2Frame.Position = UDim2.new(1, 0, 0, 40)
+Step2Frame.Visible = false
+Step2Frame.Parent = MainFrame
+
+-- Tiêu đề bước 2
+local Step2Title = Instance.new("TextLabel")
+Step2Title.BackgroundTransparency = 1
+Step2Title.Position = UDim2.new(0.5, -200, 0, 30)
+Step2Title.Size = UDim2.new(0, 400, 0, 30)
+Step2Title.Font = Enum.Font.SourceSansBold
+Step2Title.Text = "Bước 2: Đặt Tên File"
+Step2Title.TextColor3 = Color3.fromRGB(200, 200, 210)
+Step2Title.TextSize = 16
+Step2Title.Parent = Step2Frame
+
+-- Khung nhập tên
+local InputFrame = Instance.new("Frame")
+InputFrame.AnchorPoint = Vector2.new(0.5, 0)
+InputFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+InputFrame.Position = UDim2.new(0.5, 0, 0, 80)
+InputFrame.Size = UDim2.new(0, 400, 0, 50)
+InputFrame.BorderSizePixel = 0
+InputFrame.Parent = Step2Frame
+
+local InputFrameCorner = Instance.new("UICorner")
+InputFrameCorner.CornerRadius = UDim.new(0, 10)
+InputFrameCorner.Parent = InputFrame
+
+local InputFrameStroke = Instance.new("UIStroke")
+InputFrameStroke.Color = Color3.fromRGB(70, 70, 90)
+InputFrameStroke.Thickness = 1
+InputFrameStroke.Transparency = 0.5
+InputFrameStroke.Parent = InputFrame
+
+-- Ô nhập tên
+local InputBox = Instance.new("TextBox")
+InputBox.BackgroundTransparency = 1
+InputBox.Position = UDim2.new(0, 15, 0, 0)
+InputBox.Size = UDim2.new(1, -70, 1, 0)
+InputBox.Font = Enum.Font.SourceSans
+InputBox.PlaceholderText = "Nhập tên file (tối đa 12 ký tự)..."
+InputBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 120)
+InputBox.Text = ""
+InputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+InputBox.TextSize = 14
+InputBox.TextXAlignment = Enum.TextXAlignment.Left
+InputBox.ClearTextOnFocus = false
+InputBox.Parent = InputFrame
+
+-- Đếm ký tự
+local CharCounter = Instance.new("TextLabel")
+CharCounter.BackgroundTransparency = 1
+CharCounter.Position = UDim2.new(1, -55, 0, 0)
+CharCounter.Size = UDim2.new(0, 50, 1, 0)
+CharCounter.Font = Enum.Font.SourceSansBold
+CharCounter.Text = "0/12"
+CharCounter.TextColor3 = Color3.fromRGB(120, 120, 140)
+CharCounter.TextSize = 11
+CharCounter.Parent = InputFrame
+-- Progress bar
+local ProgressBar = Instance.new("Frame")
+ProgressBar.AnchorPoint = Vector2.new(0.5, 0)
+ProgressBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+ProgressBar.Position = UDim2.new(0.5, 0, 0, 140)
+ProgressBar.Size = UDim2.new(0, 400, 0, 5)
+ProgressBar.BorderSizePixel = 0
+ProgressBar.Parent = Step2Frame
+
+local ProgressBarCorner = Instance.new("UICorner")
+ProgressBarCorner.CornerRadius = UDim.new(1, 0)
+ProgressBarCorner.Parent = ProgressBar
+
+local ProgressFill = Instance.new("Frame")
+ProgressFill.BackgroundColor3 = Color3.fromRGB(100, 120, 255)
+ProgressFill.Size = UDim2.new(0, 0, 1, 0)
+ProgressFill.BorderSizePixel = 0
+ProgressFill.Parent = ProgressBar
+
+local ProgressFillCorner = Instance.new("UICorner")
+ProgressFillCorner.CornerRadius = UDim.new(1, 0)
+ProgressFillCorner.Parent = ProgressFill
+
+-- Cập nhật progress bar khi nhập tên
+local function updateProgress()
+    local length = #InputBox.Text
+    local percent = math.min(length / 12, 1)
+    TweenService:Create(ProgressFill, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        Size = UDim2.new(percent, 0, 1, 0)
+    }):Play()
+    
+    CharCounter.Text = length .. "/12"
+    if length > 10 then
+        CharCounter.TextColor3 = Color3.fromRGB(255, 100, 100)
+    elseif length > 7 then
+        CharCounter.TextColor3 = Color3.fromRGB(255, 200, 100)
+    else
+        CharCounter.TextColor3 = Color3.fromRGB(120, 120, 140)
+    end
+end
+
+InputBox:GetPropertyChangedSignal("Text"):Connect(function()
+    if #InputBox.Text > 12 then
+        InputBox.Text = string.sub(InputBox.Text, 1, 12)
+    end
+    updateProgress()
+end)
+-- Nút DECODE
+local DecodeButton = Instance.new("TextButton")
+DecodeButton.AnchorPoint = Vector2.new(0.5, 0)
+DecodeButton.BackgroundColor3 = Color3.fromRGB(100, 120, 255)
+DecodeButton.Position = UDim2.new(0.5, 0, 0, 160)
+DecodeButton.Size = UDim2.new(0, 400, 0, 45)
+DecodeButton.Font = Enum.Font.SourceSansBold
+DecodeButton.Text = "🚀 DECODE"
+DecodeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+DecodeButton.TextSize = 16
+DecodeButton.BorderSizePixel = 0
+DecodeButton.AutoButtonColor = false
+DecodeButton.Parent = Step2Frame
+
+local DecodeButtonCorner = Instance.new("UICorner")
+DecodeButtonCorner.CornerRadius = UDim.new(0, 10)
+DecodeButtonCorner.Parent = DecodeButton
+
+local DecodeButtonGradient = Instance.new("UIGradient")
+DecodeButtonGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 120, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 100, 255))
+}
+DecodeButtonGradient.Rotation = 45
+DecodeButtonGradient.Parent = DecodeButton
+
+-- Nút quay lại
+local BackButton = Instance.new("TextButton")
+BackButton.AnchorPoint = Vector2.new(0.5, 0)
+BackButton.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+BackButton.Position = UDim2.new(0.5, 0, 0, 215)
+BackButton.Size = UDim2.new(0, 400, 0, 35)
+BackButton.Font = Enum.Font.SourceSans
+BackButton.Text = "← Quay lại"
+BackButton.TextColor3 = Color3.fromRGB(200, 200, 210)
+BackButton.TextSize = 14
+BackButton.BorderSizePixel = 0
+BackButton.AutoButtonColor = false
+BackButton.Parent = Step2Frame
+
+local BackButtonCorner = Instance.new("UICorner")
+BackButtonCorner.CornerRadius = UDim.new(0, 10)
+BackButtonCorner.Parent = BackButton
+
+-- Status label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0, 15, 1, -25)
+StatusLabel.Size = UDim2.new(1, -30, 0, 20)
+StatusLabel.Font = Enum.Font.SourceSans
+StatusLabel.Text = ""
+StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
+StatusLabel.TextSize = 12
+StatusLabel.TextTransparency = 1
+StatusLabel.Parent = MainFrame
+-- Container cho particle
+local ParticleContainer = Instance.new("Frame")
+ParticleContainer.BackgroundTransparency = 1
+ParticleContainer.Size = UDim2.new(1, 0, 1, 0)
+ParticleContainer.BorderSizePixel = 0
+ParticleContainer.ZIndex = 5
+ParticleContainer.Parent = MainFrame
+
+-- Hàm tạo particle
+local function createParticle()
+    local particle = Instance.new("Frame")
+    particle.BackgroundColor3 = Color3.fromRGB(100, 120, 255)
+    particle.BorderSizePixel = 0
+    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
+    particle.Position = UDim2.new(math.random(), 0, 1, 0)
+    particle.BackgroundTransparency = 0.3
+    particle.ZIndex = 5
+    particle.Parent = ParticleContainer
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+    
+    local endPos = UDim2.new(math.random(), 0, -0.1, 0)
+    local tween = TweenService:Create(particle, TweenInfo.new(math.random(15, 30) / 10, Enum.EasingStyle.Linear), {
+        Position = endPos,
+        BackgroundTransparency = 1
+    })
+    tween:Play()
+    
+    tween.Completed:Connect(function()
+        particle:Destroy()
+    end)
+end
+
+local particleTimer = 0
+local particleConnection = RunService.RenderStepped:Connect(function(dt)
+    particleTimer = particleTimer + dt
+    if particleTimer >= 0.35 then
+        particleTimer = 0
+        createParticle()
+    end
+end)
+-- Biến global
+local storedCode = ""
+local selectedObfuscator = "auto"
+
+-- Hàm nhận dạng obfuscator (CHẮC CHẮN ĐÚNG)
+local function detectObfuscator(code)
+    -- Kiểm tra LuaObfuscator / Ferib
+    if code:find("LuaObfuscator%.com") or code:find("Much Love, Ferib") then
+        return "ferib"
+    end
+    
+    -- Kiểm tra Moonsec
+    if code:find("Moonsec") or code:find("_0x[%da-fA-F]+") then
+        return "moonsec"
+    end
+    
+    -- Kiểm tra WeAreDevs
+    if code:find("WeAreDevs") or code:find("-- WeAreDevs") then
+        return "wearedev"
+    end
+    
+    -- Kiểm tra IronBrew
+    if code:find("IronBrew") or code:find("ironbrew") then
+        return "ironbrew"
+    end
+    
+    -- Kiểm tra Kocoscript
+    if code:find("KocO") or code:find("KoC") or code:find("kocoscript") then
+        return "kocoscript"
+    end
+    
+    -- Kiểm tra dạng LuaObf phổ biến
+    if code:find("local v0=tonumber;local v1=string%.byte") then
+        return "luaobf"
+    end
+    
+    return "unknown"
+end
+
+-- Auto-resize scrolling frame
+CodeBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local lines = 1
+    for _ in CodeBox.Text:gmatch("\n") do
+        lines = lines + 1
+    end
+    CodeScrollFrame.CanvasSize = UDim2.new(0, 0, 0, math.max(120, lines * 18))
+end)
+-- Hover effect cho các nút
+local function setupHoverEffects()
+    -- Next button
+    NextButton.MouseEnter:Connect(function()
+        TweenService:Create(NextButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(110, 130, 255)
+        }):Play()
+    end)
+    
+    NextButton.MouseLeave:Connect(function()
+        TweenService:Create(NextButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(100, 120, 255)
+        }):Play()
+    end)
+    
+    -- Decode button
+    DecodeButton.MouseEnter:Connect(function()
+        TweenService:Create(DecodeButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(110, 130, 255)
+        }):Play()
+    end)
+    
+    DecodeButton.MouseLeave:Connect(function()
+        TweenService:Create(DecodeButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(100, 120, 255)
+        }):Play()
+    end)
+    
+    -- Close button
+    CloseButton.MouseEnter:Connect(function()
+        TweenService:Create(CloseButton, TweenInfo.new(0.1), {
+            BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+        }):Play()
+    end)
+    
+    CloseButton.MouseLeave:Connect(function()
+        TweenService:Create(CloseButton, TweenInfo.new(0.1), {
+            BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+        }):Play()
+    end)
+end
+
+setupHoverEffects()
+-- Nút tiếp tục
+NextButton.MouseButton1Click:Connect(function()
+    if #CodeBox.Text > 0 then
+        storedCode = CodeBox.Text
+        Step2Frame.Visible = true
+        TweenService:Create(Step2Frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            Position = UDim2.new(0, 0, 0, 40)
+        }):Play()
+    else
+        -- Hiệu ứng lắc khi chưa nhập code
+        local originalPos = CodeFrame.Position
+        for i = 1, 3 do
+            TweenService:Create(CodeFrame, TweenInfo.new(0.05), {
+                Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset - 5, originalPos.Y.Scale, originalPos.Y.Offset)
+            }):Play()
+            wait(0.05)
+            TweenService:Create(CodeFrame, TweenInfo.new(0.05), {
+                Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset + 5, originalPos.Y.Scale, originalPos.Y.Offset)
+            }):Play()
+            wait(0.05)
+            TweenService:Create(CodeFrame, TweenInfo.new(0.05), {
+                Position = originalPos
+            }):Play()
+            wait(0.05)
+        end
+    end
+end)
+
+-- Nút quay lại
+BackButton.MouseButton1Click:Connect(function()
+    TweenService:Create(Step2Frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+        Position = UDim2.new(1, 0, 0, 40)
+    }):Play()
+    wait(0.3)
+    Step2Frame.Visible = false
+end)
+local hasDecoded = false
+
+DecodeButton.MouseButton1Click:Connect(function()
+    -- KIỂM TRA ĐIỀU KIỆN
+    if #InputBox.Text == 0 then
+        StatusLabel.Text = "❌ Chưa nhập tên file!"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        TweenService:Create(StatusLabel, TweenInfo.new(0.3), {
+            TextTransparency = 0
+        }):Play()
+        return
+    end
+    
+    if #InputBox.Text > 12 then
+        StatusLabel.Text = "❌ Tên file quá dài (tối đa 12 ký tự)!"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        TweenService:Create(StatusLabel, TweenInfo.new(0.3), {
+            TextTransparency = 0
+        }):Play()
+        return
+    end
+    
+    if hasDecoded then
+        StatusLabel.Text = "⚠️ Đã decode rồi, reload để decode lại!"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+        TweenService:Create(StatusLabel, TweenInfo.new(0.3), {
+            TextTransparency = 0
+        }):Play()
+        return
+    end
+    
+    -- KIỂM TRA WRITEFILE
+    if not writefile then
+        StatusLabel.Text = "❌ Lỗi: writefile không hỗ trợ!"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        TweenService:Create(StatusLabel, TweenInfo.new(0.3), {
+            TextTransparency = 0
+        }):Play()
+        DecodeButton.Text = "✗ LỖI"
+        return
+    end
+    
+    -- BẮT ĐẦU DECODE
+    hasDecoded = true
+    DecodeButton.Active = false
+    DecodeButton.Text = "⏳ ĐANG DECODE..."
+    
+    -- Particle burst
+    for i = 1, 20 do
+        createParticle()
+        wait(0.02)
+    end
+    
+    local userFileName = InputBox.Text
+    local obfCode = storedCode
+    local detectedObf = detectObfuscator(obfCode)
+    
+    print("🔍 Detected obfuscator: " .. detectedObf)
+    
+    -- Lưu thông tin
+    local dumped = 0
+    local old_load = load
+    local old_loadstring = loadstring
+    local lastCode = nil
+    
+    -- Hàm lưu code
+    local function save(code, stage)
+        if type(code) ~= "string" or #code == 0 then
+            return
+        end
+        lastCode = code
+        dumped = dumped + 1
+        local name = userFileName .. "_" .. stage .. ".txt"
+        writefile(name, code)
+        print("💾 SAVED:", name, "(" .. #code .. " bytes)")
+    end
+    
+    -- HOOK load VÀ loadstring (CHÌA KHÓA DECODE)
+    getgenv().load = function(code, ...)
+        if code and type(code) == "string" and #code > 0 then
+            save(code, "load")
+        end
+        return old_load(code, ...)
+    end
+    
+    getgenv().loadstring = function(code, ...)
+        if code and type(code) == "string" and #code > 0 then
+            save(code, "loadstring")
+        end
+        return old_loadstring(code, ...)
+    end
+    
+    -- CHẠY CODE OBFUSCATED
+    local success, err = pcall(function()
+        local func = loadstring(obfCode)
+        if func then
+            func()
+        end
+    end)
+    
+    wait(1)
+    
+    -- LƯU KẾT QUẢ CUỐI CÙNG
+    if lastCode then
+        local finalName = userFileName .. "_FINAL.txt"
+        writefile(finalName, lastCode)
+        print("💾 SAVED FINAL:", finalName, "(" .. #lastCode .. " bytes)")
+        
+        -- THÀNH CÔNG
+        DecodeButton.Text = "✅ HOÀN TẤT!"
+        TweenService:Create(DecodeButton, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(100, 255, 150)
+        }):Play()
+        
+        StatusLabel.Text = "✅ Decode thành công! Detected: " .. detectedObf
+        StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
+        TweenService:Create(StatusLabel, TweenInfo.new(0.3), {
+            TextTransparency = 0
+        }):Play()
+        
+        print("✅ DECODE COMPLETED!")
+        print("📁 Files saved: " .. dumped + 1)
+        print("🔍 Obfuscator: " .. detectedObf)
+    else
+        -- THẤT BẠI
+        DecodeButton.Text = "✗ THẤT BẠI"
+        TweenService:Create(DecodeButton, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+        }):Play()
+        
+        StatusLabel.Text = "❌ Decode thất bại! Không tìm thấy code."
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        TweenService:Create(StatusLabel, TweenInfo.new(0.3), {
+            TextTransparency = 0
+        }):Play()
+    end
+end)
+-- Đóng GUI
+CloseButton.MouseButton1Click:Connect(function()
+    particleConnection:Disconnect()
+    ScreenGui:Destroy()
+end)
+
+-- KÉO THẢ GUI
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+TopBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        TweenService:Create(MainFrame, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+            Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        }):Play()
+    end
+end)
+
+-- Focus effects
+CodeBox.Focused:Connect(function()
+    TweenService:Create(CodeFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(100, 120, 255),
+        Transparency = 0
+    }):Play()
+end)
+
+CodeBox.FocusLost:Connect(function()
+    TweenService:Create(CodeFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(70, 70, 90),
+        Transparency = 0.5
+    }):Play()
+end)
+
+InputBox.Focused:Connect(function()
+    TweenService:Create(InputFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(100, 120, 255),
+        Transparency = 0
+    }):Play()
+end)
+
+InputBox.FocusLost:Connect(function()
+    TweenService:Create(InputFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(70, 70, 90),
+        Transparency = 0.5
+    }):Play()
+end)
+
+-- Hiển thị GUI
+ScreenGui.Parent = playerGui
