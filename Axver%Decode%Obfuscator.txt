@@ -1,3 +1,9 @@
+--[[
+    AXVER DECODER PRO - FIXED VERSION
+    Hỗ trợ: LuaObf, Moonsec, WeAreDevs, Ferib, IronBrew, Kocoscript
+    Fixed by: Assistant
+]]
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -14,6 +20,11 @@ end
 
 wait(0.1)
 
+-- BIẾN TOÀN CỤC
+local selectedObfuscator = "auto"
+local old_print = print
+local storedCode = ""
+local hasDecoded = false
 -- Tạo ScreenGui chính
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DecoderGUI"
@@ -32,6 +43,7 @@ MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
 MainFrame.Active = true
 MainFrame.Parent = ScreenGui
+
 -- Bo góc chính
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 16)
@@ -43,7 +55,6 @@ UIStroke.Color = Color3.fromRGB(60, 60, 80)
 UIStroke.Thickness = 2
 UIStroke.Transparency = 0.3
 UIStroke.Parent = MainFrame
-
 -- Thanh tiêu đề
 local TopBar = Instance.new("Frame")
 TopBar.Name = "TopBar"
@@ -271,6 +282,7 @@ HintLabel.TextSize = 11
 HintLabel.TextXAlignment = Enum.TextXAlignment.Left
 HintLabel.TextWrapped = true
 HintLabel.Parent = Step1Frame
+
 -- Nút tiếp tục
 local NextButton = Instance.new("TextButton")
 NextButton.AnchorPoint = Vector2.new(1, 0)
@@ -383,13 +395,15 @@ local ProgressFillCorner = Instance.new("UICorner")
 ProgressFillCorner.CornerRadius = UDim.new(1, 0)
 ProgressFillCorner.Parent = ProgressFill
 
--- Cập nhật progress bar khi nhập tên
+-- Hàm cập nhật progress bar
 local function updateProgress()
     local length = #InputBox.Text
     local percent = math.min(length / 12, 1)
-    TweenService:Create(ProgressFill, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+    
+    local tween = TweenService:Create(ProgressFill, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
         Size = UDim2.new(percent, 0, 1, 0)
-    }):Play()
+    })
+    tween:Play()
     
     CharCounter.Text = length .. "/12"
     if length > 10 then
@@ -407,6 +421,7 @@ InputBox:GetPropertyChangedSignal("Text"):Connect(function()
     end
     updateProgress()
 end)
+
 -- Nút DECODE
 local DecodeButton = Instance.new("TextButton")
 DecodeButton.AnchorPoint = Vector2.new(0.5, 0)
@@ -470,8 +485,15 @@ ParticleContainer.BorderSizePixel = 0
 ParticleContainer.ZIndex = 5
 ParticleContainer.Parent = MainFrame
 
--- Hàm tạo particle
+-- PARTICLE ĐÃ FIX - GIỚI HẠN SỐ LƯỢNG
+local particleTimer = 0
+local maxParticles = 30  -- Giới hạn tối đa
+local particleCount = 0
+
 local function createParticle()
+    if particleCount >= maxParticles then return end
+    
+    particleCount = particleCount + 1
     local particle = Instance.new("Frame")
     particle.BackgroundColor3 = Color3.fromRGB(100, 120, 255)
     particle.BorderSizePixel = 0
@@ -494,22 +516,18 @@ local function createParticle()
     
     tween.Completed:Connect(function()
         particle:Destroy()
+        particleCount = particleCount - 1
     end)
 end
 
-local particleTimer = 0
 local particleConnection = RunService.RenderStepped:Connect(function(dt)
     particleTimer = particleTimer + dt
-    if particleTimer >= 0.35 then
+    if particleTimer >= 0.4 and particleCount < maxParticles then
         particleTimer = 0
         createParticle()
     end
 end)
--- Biến global
-local storedCode = ""
-local selectedObfuscator = "auto"
-
--- Hàm nhận dạng obfuscator (CHẮC CHẮN ĐÚNG)
+-- Hàm nhận dạng obfuscator
 local function detectObfuscator(code)
     -- Kiểm tra LuaObfuscator / Ferib
     if code:find("LuaObfuscator%.com") or code:find("Much Love, Ferib") then
@@ -595,6 +613,35 @@ local function setupHoverEffects()
 end
 
 setupHoverEffects()
+
+-- Focus effects
+CodeBox.Focused:Connect(function()
+    TweenService:Create(CodeFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(100, 120, 255),
+        Transparency = 0
+    }):Play()
+end)
+
+CodeBox.FocusLost:Connect(function()
+    TweenService:Create(CodeFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(70, 70, 90),
+        Transparency = 0.5
+    }):Play()
+end)
+
+InputBox.Focused:Connect(function()
+    TweenService:Create(InputFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(100, 120, 255),
+        Transparency = 0
+    }):Play()
+end)
+
+InputBox.FocusLost:Connect(function()
+    TweenService:Create(InputFrameStroke, TweenInfo.new(0.2), {
+        Color = Color3.fromRGB(70, 70, 90),
+        Transparency = 0.5
+    }):Play()
+end)
 -- Nút tiếp tục
 NextButton.MouseButton1Click:Connect(function()
     if #CodeBox.Text > 0 then
@@ -631,8 +678,6 @@ BackButton.MouseButton1Click:Connect(function()
     wait(0.3)
     Step2Frame.Visible = false
 end)
-local hasDecoded = false
-
 DecodeButton.MouseButton1Click:Connect(function()
     -- KIỂM TRA ĐIỀU KIỆN
     if #InputBox.Text == 0 then
@@ -679,7 +724,7 @@ DecodeButton.MouseButton1Click:Connect(function()
     DecodeButton.Text = "⏳ ĐANG DECODE..."
     
     -- Particle burst
-    for i = 1, 20 do
+    for i = 1, 10 do
         createParticle()
         wait(0.02)
     end
@@ -723,13 +768,31 @@ DecodeButton.MouseButton1Click:Connect(function()
         return old_loadstring(code, ...)
     end
     
-    -- CHẠY CODE OBFUSCATED
+    -- Hook print để bắt debug output
+    getgenv().print = function(...)
+        local args = {...}
+        for _, arg in ipairs(args) do
+            if type(arg) == "string" and #arg > 100 then
+                save(arg, "print")
+            end
+        end
+        old_print(...)
+    end
+    
+    -- CHẠY CODE OBFUSCATED (CÓ PCALL KÉP)
     local success, err = pcall(function()
         local func = loadstring(obfCode)
         if func then
-            func()
+            local s, e = pcall(func)
+            if not s then
+                warn("⚠️ Lỗi khi chạy code:", e)
+            end
         end
     end)
+    
+    if not success then
+        warn("❌ Lỗi khi loadstring:", err)
+    end
     
     wait(1)
     
@@ -768,80 +831,44 @@ DecodeButton.MouseButton1Click:Connect(function()
         }):Play()
     end
 end)
+-- KÉO THẢ ĐÃ FIX - HỖ TRỢ CẢ CHUỘT VÀ TOUCH
+local dragging = false
+local dragStart
+local startPos
+
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+    end
+end)
+
+TopBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
 -- Đóng GUI
 CloseButton.MouseButton1Click:Connect(function()
     particleConnection:Disconnect()
     ScreenGui:Destroy()
 end)
 
--- KÉO THẢ GUI
-local dragging = false
-local dragInput
-local dragStart
-local startPos
-
-TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-TopBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        TweenService:Create(MainFrame, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
-            Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-        }):Play()
-    end
-end)
-
--- Focus effects
-CodeBox.Focused:Connect(function()
-    TweenService:Create(CodeFrameStroke, TweenInfo.new(0.2), {
-        Color = Color3.fromRGB(100, 120, 255),
-        Transparency = 0
-    }):Play()
-end)
-
-CodeBox.FocusLost:Connect(function()
-    TweenService:Create(CodeFrameStroke, TweenInfo.new(0.2), {
-        Color = Color3.fromRGB(70, 70, 90),
-        Transparency = 0.5
-    }):Play()
-end)
-
-InputBox.Focused:Connect(function()
-    TweenService:Create(InputFrameStroke, TweenInfo.new(0.2), {
-        Color = Color3.fromRGB(100, 120, 255),
-        Transparency = 0
-    }):Play()
-end)
-
-InputBox.FocusLost:Connect(function()
-    TweenService:Create(InputFrameStroke, TweenInfo.new(0.2), {
-        Color = Color3.fromRGB(70, 70, 90),
-        Transparency = 0.5
-    }):Play()
-end)
-
 -- Hiển thị GUI
 ScreenGui.Parent = playerGui
+
+print("✅ Axver Decoder Pro - Đã tải thành công!")
+print("📌 Hỗ trợ: LuaObf, Moonsec, WeAreDevs, Ferib, IronBrew, Kocoscript")
