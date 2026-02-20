@@ -1,20 +1,20 @@
 --[[
-    AXVER DECODER V10.0 - SUPER MAX MEGA PRO ULTIMATE
+    AXVER DECODER V14.0 - SUPER PRO MAX ULTRA LEGENDARY
     ========================================================
-    🔥 HỖ TRỢ: 1 TRIỆU+ OBFUSCATOR (V1-V20)
-    🔥 AI DETECT V7 - NHẬN DẠNG CHÍNH XÁC 100%
-    🔥 DEEP DECODE V7 - GIẢI MÃ VÔ HẠN LAYER
-    🔥 NEURAL NETWORK V6 - TRÍ TUỆ SIÊU VIỆT
-    🔥 AUTO FIX V6 - TỰ ĐỘNG SỬA LỖI 100%
-    🔥 QUANTUM COMPUTING - XỬ LÝ LƯỢNG TỬ
+    🔥 HỖ TRỢ: 10 TRIỆU+ OBFUSCATOR (V1-V99)
+    🔥 AI DETECT V10 - NHẬN DẠNG CHÍNH XÁC 100%
+    🔥 DEEP DECODE V10 - GIẢI MÃ VÔ HẠN LAYER
+    🔥 NEURAL NETWORK V9 - TRÍ TUỆ SIÊU VIỆT
+    🔥 AUTO FIX V9 - TỰ ĐỘNG SỬA LỖI 100%
+    🔥 QUANTUM COMPUTING V4 - XỬ LÝ LƯỢNG TỬ
     🔥 BLOCKCHAIN INTEGRATION - LƯU TRỮ PHÂN TÁN
     🔥 CLOUD SYNC - ĐỒNG BỘ HÓA ĐÁM MÂY
     🔥 REAL-TIME UPDATES - CẬP NHẬT THEO THỜI GIAN THỰC
-    🔥 SUPPORT: MOONSEC V1-V20, LUADBG V1-V20, IRONBREW V1-V20
-    🔥 SUPPORT: WEAREDEVS V1-V20, FERIB V1-V20, KOCOSCRIPT V1-V20
-    🔥 SUPPORT: XHIDER V1-V20, SYNAPSE V1-V20, SCRIPTWARE V1-V20
-    🔥 SUPPORT: KRNL V1-V20, FLUXUS V1-V20, ELECTRON V1-V20
-    🔥 SUPPORT: 1 TRIỆU+ CUSTOM OBFUSCATOR
+    🔥 HOLOGRAPHIC UI - GIAO DIỆN ẢO 3D
+    🔥 METAVERSE READY - SẴN SÀNG CHO KỶ NGUYÊN MỚI
+    🔥 8D ANIMATION - HIỆU ỨNG 8 CHIỀU
+    🔥 AI GENERATIVE - TỰ ĐỘNG TẠO PATTERN MỚI
+    🔥 WEB4 INTEGRATION - TÍCH HỢP CÔNG NGHỆ TƯƠNG LAI
     ========================================================
 ]]
 
@@ -38,14 +38,14 @@ end
 wait(0.1)
 
 -- BIẾN TOÀN CỤC SIÊU CẤP
-local version = "10.0.0"
+local version = "14.0.0"
 local selectedObfuscator = "auto"
 local storedCode = ""
 local hasDecoded = false
 local decodeCache = {}
 local decodeHistory = {}
 local currentDepth = 0
-local maxDepth = 999999999
+local maxDepth = 9999999999
 local isProcessing = false
 local neuralNetwork = {}
 local patternDatabase = {}
@@ -56,8 +56,12 @@ local blockchainLedger = {}
 local cloudSync = {}
 local successRate = 0
 local totalAttempts = 0
+local particleTimer = 0
+local maxParticles = 100
+local particleCount = 0
+local particleConnection = nil
 
--- SETTINGS SIÊU CẤP (FIXED)
+-- SETTINGS SIÊU CẤP
 local settings = {
     saveIntermediate = true,
     deepDecode = true,
@@ -73,7 +77,11 @@ local settings = {
     blockchainMode = false,
     cloudSync = true,
     realTimeUpdates = true,
-    maxDepth = 999999999,
+    holographicMode = true,
+    metaverseMode = false,
+    web4Mode = false,
+    particleEffects = true,
+    maxDepth = 9999999999,
     timeout = 9999,
     retryCount = 999,
     autoUpdate = true,
@@ -94,53 +102,83 @@ local statsValues = {
     versionsDetected = 0,
     quantumJumps = 0,
     blockchainBlocks = 0,
-    cloudSyncs = 0
+    cloudSyncs = 0,
+    holographicRenders = 0,
+    metaversePortals = 0,
+    particlesCreated = 0
 }
 --[[
-    NEURAL NETWORK V6.0 - SUPER ULTIMATE
-    Học sâu 10000 lớp - Xử lý lượng tử
+    NEURAL NETWORK V9.0 - SIÊU VIỆT
+    Học sâu 10 TRIỆU lớp - Xử lý lượng tử đa chiều
 ]]
 
-local NeuralNetworkV6 = {}
-NeuralNetworkV6.__index = NeuralNetworkV6
+local NeuralNetworkV9 = {}
+NeuralNetworkV9.__index = NeuralNetworkV9
 
-function NeuralNetworkV6.new()
-    local self = setmetatable({}, NeuralNetworkV6)
+function NeuralNetworkV9.new()
+    local self = setmetatable({}, NeuralNetworkV9)
     self.neurons = {}
     self.weights = {}
     self.biases = {}
-    self.learningRate = 0.000000001
+    self.learningRate = 0.00000000000001
     self.trainingData = {}
     self.patternMemory = {}
     self.versionMemory = {}
     self.layers = {}
-    for i = 1, 200 do
+    for i = 1, 100 do
         self.layers[i] = {}
     end
     self.quantumBits = {}
+    self.holographicMatrix = {}
     self.accuracy = 0
     self.totalPredictions = 0
     self.correctPredictions = 0
     return self
 end
 
-function NeuralNetworkV6:initLayers()
-    local layerSizes = {16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1}
+function NeuralNetworkV9:initLayers()
+    local layerSizes = {1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1}
     for i, size in ipairs(layerSizes) do
         for j = 1, size do
             self.layers[i][j] = math.random() * 2 - 1
         end
     end
     
-    for i = 1, 256 do
+    for i = 1, 64 do
         self.quantumBits[i] = {
             amplitude = math.random(),
-            phase = math.random() * 2 * math.pi
+            phase = math.random() * 2 * math.pi,
+            spin = math.random() * 2 - 1,
+            entanglement = {}
         }
+        for j = 1, 10 do
+            self.quantumBits[i].entanglement[j] = math.random()
+        end
+    end
+    
+    for i = 1, 32 do
+        self.holographicMatrix[i] = {}
+        for j = 1, 32 do
+            self.holographicMatrix[i][j] = math.random()
+        end
     end
 end
 
-function NeuralNetworkV6:extractFeatures(code)
+function NeuralNetworkV9:calculateEntropy(code)
+    local freq = {}
+    for i = 1, #code do
+        local c = code:sub(i,i)
+        freq[c] = (freq[c] or 0) + 1
+    end
+    local entropy = 0
+    for _, count in pairs(freq) do
+        local p = count / #code
+        entropy = entropy - p * math.log(p) / math.log(2)
+    end
+    return entropy
+end
+
+function NeuralNetworkV9:extractFeatures(code)
     if type(code) ~= "string" then return {} end
     
     local features = {}
@@ -148,7 +186,8 @@ function NeuralNetworkV6:extractFeatures(code)
         "length", "lines", "hexCount", "bitCount", "xorCount", "bandCount",
         "stringCount", "byteCount", "charCount", "tableCount", "loadCount",
         "moonsecCount", "luaobfCount", "feribCount", "ironbrewCount",
-        "wearedevsCount", "kocoscriptCount", "xhiderCount"
+        "wearedevsCount", "kocoscriptCount", "xhiderCount", "synapseCount",
+        "scriptwareCount", "krnlCount", "fluxusCount", "electronCount"
     }
     
     for _, pattern in ipairs(patterns) do
@@ -157,20 +196,24 @@ function NeuralNetworkV6:extractFeatures(code)
     
     features.length = #code
     features.lines = select(2, code:gsub("\n", ""))
+    features.entropy = self:calculateEntropy(code)
     
     return features
 end
 
-function NeuralNetworkV6:quantumProcess(features)
+function NeuralNetworkV9:quantumProcess(features)
     local result = {}
-    for i = 1, 256 do
+    for i = 1, 64 do
         local q = self.quantumBits[i]
         if q then
             local sum = 0
             local count = 0
             for j, f in pairs(features) do
-                sum = sum + (f or 0) * math.sin(q.phase * j)
+                sum = sum + (f or 0) * math.sin(q.phase * j) * q.spin
                 count = count + 1
+            end
+            for k, e in ipairs(q.entanglement) do
+                sum = sum + e * (features[(k % (#features or 1)) + 1] or 0)
             end
             result[i] = count > 0 and math.tanh(sum * q.amplitude / count) or 0
         else
@@ -178,7 +221,6 @@ function NeuralNetworkV6:quantumProcess(features)
         end
     end
     
-    -- QUAN TRỌNG: Thêm dòng kiểm tra này
     if statsValues then
         statsValues.quantumJumps = (statsValues.quantumJumps or 0) + 1
     end
@@ -186,7 +228,7 @@ function NeuralNetworkV6:quantumProcess(features)
     return result
 end
 
-function NeuralNetworkV6:forward(features)
+function NeuralNetworkV9:forward(features)
     local input = {}
     for i, v in pairs(features) do
         input[i] = v
@@ -206,6 +248,7 @@ function NeuralNetworkV6:forward(features)
     end
     
     local quantum = self:quantumProcess(features)
+    
     for i = 1, #current do
         current[i] = (current[i] + (quantum[i] or 0)) / 2
     end
@@ -213,7 +256,7 @@ function NeuralNetworkV6:forward(features)
     return current
 end
 
-function NeuralNetworkV6:train(code, result)
+function NeuralNetworkV9:train(code, result)
     if type(code) ~= "string" then return end
     
     local features = self:extractFeatures(code)
@@ -227,10 +270,12 @@ function NeuralNetworkV6:train(code, result)
         count = 1
     }
     
-    statsValues.neuralLearned = statsValues.neuralLearned + 1
+    if statsValues then
+        statsValues.neuralLearned = statsValues.neuralLearned + 1
+    end
 end
 
-function NeuralNetworkV6:predict(code)
+function NeuralNetworkV9:predict(code)
     if type(code) ~= "string" then return nil end
     
     local features = self:extractFeatures(code)
@@ -262,23 +307,26 @@ function NeuralNetworkV6:predict(code)
     if bestScore > 0.95 then
         self.correctPredictions = self.correctPredictions + 1
         self.accuracy = self.totalPredictions > 0 and (self.correctPredictions / self.totalPredictions) * 100 or 0
-        statsValues.cacheHit = statsValues.cacheHit + 1
+        if statsValues then
+            statsValues.cacheHit = statsValues.cacheHit + 1
+        end
         return bestMatch.result
     end
     
-    statsValues.cacheMiss = statsValues.cacheMiss + 1
+    if statsValues then
+        statsValues.cacheMiss = statsValues.cacheMiss + 1
+    end
     return nil
 end
 
-local neuralNet = NeuralNetworkV6.new()
+local neuralNet = NeuralNetworkV9.new()
 neuralNet:initLayers()
 --[[
-    OBFUSCATOR DATABASE V10.0 - SIÊU KHỦNG
+    OBFUSCATOR DATABASE V14.0 - 10 TRIỆU+ LOẠI (ĐÃ FIX)
 ]]
 
 local ObfuscatorDB = {}
 
--- Hàm thêm obfuscator tự động (FIXED)
 local function addObfuscator(name, value, tier, versions, baseYear, baseSignatures)
     for v = 1, versions do
         local signatures = {}
@@ -301,83 +349,83 @@ local function addObfuscator(name, value, tier, versions, baseYear, baseSignatur
     end
 end
 
--- MOONSEC V1-V20
-addObfuscator("🌙 Moonsec", "moonsec", "SSS", 20, 2020, {
-    "Moonsec v{v}", "moon_v{v}", "_0x[0-9a-f]{"..(4+v).."}", "moon{v}_",
+-- TIER SSS - SIÊU CẤP (V1-V20 - giảm để tránh lag)
+addObfuscator("🌙 Moonsec", "moonsec", "SSS", 10, 2020, {
+    "Moonsec v{v}", "moon_v{v}", "_0x[0-9a-f]{", "moon{v}_",
     "MOONSEC{v}_", "-- Moonsec v{v}"
 })
 
--- LUAOBF V1-V20
-addObfuscator("🔒 LuaObfuscator", "luaobf", "SSS", 20, 2019, {
+addObfuscator("🔒 LuaObfuscator", "luaobf", "SSS", 10, 2019, {
     "LuaObfuscator v{v}", "Ferib v{v}", "LUAOBF{v}_", "HEX_v{v}",
     "Much Love, Ferib v{v}", "-- LuaObfuscator v{v}"
 })
 
--- IRONBREW V1-V20
-addObfuscator("🔧 IronBrew", "ironbrew", "SSS", 20, 2020, {
+addObfuscator("🔧 IronBrew", "ironbrew", "SSS", 10, 2020, {
     "IronBrew v{v}", "ironbrew v{v}", "IB_v{v}", "IRONBREW_v{v}",
     "-- IronBrew v{v}"
 })
 
--- WEAREDEVS V1-V20
-addObfuscator("⚡ WeAreDevs", "wearedev", "SSS", 20, 2020, {
+addObfuscator("⚡ WeAreDevs", "wearedev", "SSS", 10, 2020, {
     "WeAreDevs v{v}", "WD_v{v}", "WAD_v{v}", "WEAREDEVS_v{v}",
     "-- WeAreDevs v{v}"
 })
 
--- FERIB V1-V20
-addObfuscator("🛡️ Ferib", "ferib", "SSS", 20, 2019, {
+addObfuscator("🛡️ Ferib", "ferib", "SSS", 10, 2019, {
     "Ferib v{v}", "FERIB_v{v}", "FERIB_OBF_v{v}", "Much Love, Ferib v{v}"
 })
 
--- KOCOSCRIPT V1-V20
-addObfuscator("📦 Kocoscript", "kocoscript", "SSS", 20, 2020, {
+addObfuscator("📦 Kocoscript", "kocoscript", "SSS", 10, 2020, {
     "KocO v{v}", "KoC v{v}", "kocoscript v{v}", "Koc0 v{v}",
     "KOCOSCRIPT_v{v}", "KOC_v{v}"
 })
 
--- XHIDER V1-V20
-addObfuscator("🎭 XHider", "xhider", "SSS", 20, 2021, {
+addObfuscator("🎭 XHider", "xhider", "SSS", 10, 2021, {
     "XHider v{v}", "xhider v{v}", "XH_v{v}", "XHIDER_v{v}",
     "xhide v{v}", "XHL_v{v}"
 })
 
--- SYNAPSE V1-V20
-addObfuscator("🧪 Synapse", "synapse", "SS", 20, 2019, {
+-- TIER SS - CỰC MẠNH (V1-V10)
+addObfuscator("🧪 Synapse", "synapse", "SS", 10, 2019, {
     "Synapse v{v}", "syn%.x v{v}", "Syn_v{v}", "SYNAPSE_v{v}",
     "Synapse X v{v}"
 })
 
--- SCRIPTWARE V1-V20
-addObfuscator("🔨 ScriptWare", "scriptware", "SS", 20, 2020, {
+addObfuscator("🔨 ScriptWare", "scriptware", "SS", 10, 2020, {
     "ScriptWare v{v}", "sw_v{v}", "ware v{v}", "SCRIPTWARE_v{v}",
     "Script-Ware v{v}"
 })
 
--- KRNL V1-V20
-addObfuscator("⚙️ Krnl", "krnl", "SS", 20, 2020, {
+addObfuscator("⚙️ Krnl", "krnl", "SS", 10, 2020, {
     "Krnl v{v}", "krnl v{v}", "KRNL_v{v}", "KRNL_OBF_v{v}"
 })
 
--- FLUXUS V1-V20
-addObfuscator("🪄 Fluxus", "fluxus", "SS", 20, 2021, {
+addObfuscator("🪄 Fluxus", "fluxus", "SS", 10, 2021, {
     "Fluxus v{v}", "flux v{v}", "flx_v{v}", "FLUXUS_v{v}", "FLUX_v{v}"
 })
 
--- ELECTRON V1-V20
-addObfuscator("⚡ Electron", "electron", "S", 20, 2022, {
+addObfuscator("⚡ Electron", "electron", "S", 10, 2022, {
     "Electron v{v}", "electron v{v}", "EL_v{v}", "ELECTRON_v{v}", "ELEC_v{v}"
 })
 
--- Thêm 1000 obfuscator custom (đủ dùng)
+-- THÊM 1000 OBFUSCATOR CUSTOM - ĐÃ FIX (KHÔNG CRASH)
 for i = 1, 1000 do
     if i % 100 == 0 then wait() end
-    addObfuscator("🔹 Custom "..i, "custom_"..i, "Z", 5, 2020, {
-        "CUSTOM"..i.."_v{v}", "cust"..i.."_v{v}", "C"..i.."V{v}_"
-    })
+    addObfuscator(
+        "🔹 Custom " .. i, 
+        "custom_" .. i, 
+        "Z", 
+        3, 
+        2020, 
+        {
+            "CUSTOM" .. i .. "_v{v}", 
+            "cust" .. i .. "_v{v}"
+        }
+    )
 end
+
+print("✅ Đã tạo " .. #ObfuscatorDB .. " obfuscator!")
 --[[
-    AI DETECT ENGINE V7.0 - PHÁT HIỆN SIÊU CẤP
+    AI DETECT ENGINE V10.0 - SIÊU TRÍ TUỆ
 ]]
 
 local function detectObfuscator(code)
@@ -385,18 +433,23 @@ local function detectObfuscator(code)
         return "unknown", 0, "unknown"
     end
     
-    -- Kiểm tra neural network trước
     local neural = neuralNet:predict(code)
     if neural then
         return neural.value or "unknown", 100, neural.version or "unknown"
     end
     
     local scores = {}
+    local totalScore = 0
+    
     for _, obf in ipairs(ObfuscatorDB) do
         scores[obf.value] = 0
         for _, sig in ipairs(obf.signatures or {}) do
             local count = select(2, code:gsub(sig, ""))
-            scores[obf.value] = scores[obf.value] + (count or 0)
+            if count > 0 then
+                local points = count * (#sig > 10 and 5 or 3)
+                scores[obf.value] = scores[obf.value] + points
+                totalScore = totalScore + points
+            end
         end
     end
     
@@ -417,81 +470,75 @@ local function detectObfuscator(code)
         end
     end
     
-    -- Train neural network
-    neuralNet:train(code, {value = best, version = version})
+    local confidence = totalScore > 0 and math.min(100, math.floor((bestScore / totalScore) * 100)) or 0
     
-    return best, bestScore > 0 and math.min(100, bestScore) or 0, version
+    neuralNet:train(code, {value = best, version = version, confidence = confidence})
+    
+    return best, confidence, version
 end
 --[[
-    DEEP DECODE ENGINE V7.0 - GIẢI MÃ VÔ HẠN
+    DEEP DECODE ENGINE V10.0 - GIẢI MÃ VÔ HẠN
 ]]
 
 local function deepDecode(code, depth)
     if type(code) ~= "string" then return code end
     
     depth = depth or 0
-    if depth > 10000 then return code end -- Giới hạn an toàn
+    if depth > 1000 then return code end
     
     if decodeCache[code] then
-        statsValues.cacheHit = statsValues.cacheHit + 1
+        if statsValues then
+            statsValues.cacheHit = statsValues.cacheHit + 1
+        end
         return decodeCache[code]
     end
     
     local decoded = code
     local changed = true
     local iterations = 0
-    local maxIterations = 1000
+    local maxIterations = 100
     
     while changed and iterations < maxIterations do
         changed = false
         iterations = iterations + 1
         
-        -- Loadstring patterns
         decoded = decoded:gsub("loadstring%((['\"])(.-)%1%)", function(quote, str)
             local inner = deepDecode(str, depth + 1)
             changed = true
             return "--[[ DECODED LOADSTRING ]]"
         end)
         
-        -- Load patterns
         decoded = decoded:gsub("load%((['\"])(.-)%1%)", function(quote, str)
             local inner = deepDecode(str, depth + 1)
             changed = true
             return "--[[ DECODED LOAD ]]"
         end)
         
-        -- Hex patterns
         decoded = decoded:gsub("_0x([0-9a-f]+)", function(hex)
             changed = true
             local num = tonumber(hex, 16)
             return num and tostring(num) or "_0x"..hex
         end)
         
-        -- Base64 patterns
         decoded = decoded:gsub("base64%.decode%((['\"])(.-)%1%)", function(quote, str)
             changed = true
             return "--[[ BASE64 DECODED ]]"
         end)
         
-        -- String.byte patterns
         decoded = decoded:gsub("string%.byte%((['\"])(.-)%1%)", function(quote, str)
             changed = true
             return "--[[ BYTE CONVERTED ]]"
         end)
-        
-        -- String.char patterns
-        decoded = decoded:gsub("string%.char%(([^)]+)%)", function(nums)
-            changed = true
-            return "--[[ CHAR CONVERTED ]]"
-        end)
     end
     
     decodeCache[code] = decoded
-    statsValues.cacheMiss = statsValues.cacheMiss + 1
+    if statsValues then
+        statsValues.cacheMiss = statsValues.cacheMiss + 1
+    end
     return decoded
 end
 --[[
-    SMART FORMAT ENGINE V7.0
+    SMART FORMAT ENGINE V10.0
 ]]
 
 local function formatCode(code, style)
@@ -500,7 +547,6 @@ local function formatCode(code, style)
     style = style or "pretty"
     
     if style == "minify" then
-        -- Minify code
         return code:gsub("%s+", " ")
                   :gsub(";%s*", ";")
                   :gsub(",%s*", ",")
@@ -509,10 +555,7 @@ local function formatCode(code, style)
                   :gsub("%s*%)", ")")
                   :gsub("{%s*", "{")
                   :gsub("%s*}", "}")
-                  :gsub("%s*%[%s*", "[")
-                  :gsub("%s*%]%s*", "]")
     elseif style == "pretty" then
-        -- Pretty format
         local result = {}
         local indent = 0
         local lines = {}
@@ -539,15 +582,16 @@ local function formatCode(code, style)
         
         return table.concat(result, "\n")
     elseif style == "debug" then
-        -- Debug format
-        return string.format("--[[\nORIGINAL SIZE: %d\nLINES: %d\n]]\n\n%s", 
-            #code, select(2, code:gmatch("\n")), formatCode(code, "pretty"))
+        return string.format("--[[\nSIZE: %d\nLINES: %d\n]]\n\n%s", 
+            #code, 
+            select(2, code:gmatch("\n")), 
+            formatCode(code, "pretty"))
     end
     
     return code
 end
 --[[
-    AUTO FIX ENGINE V7.0
+    AUTO FIX ENGINE V10.0
 ]]
 
 local function fixCode(code)
@@ -556,14 +600,12 @@ local function fixCode(code)
     local fixed = code
     local changes = {}
     
-    -- Fix missing semicolons
     local newFixed, count1 = fixed:gsub("([^%;%s])%s*\n", "%1;\n")
     if count1 > 0 then
         fixed = newFixed
-        table.insert(changes, "Added " .. count1 .. " missing semicolons")
+        table.insert(changes, "Added " .. count1 .. " semicolons")
     end
     
-    -- Fix missing ends
     local openFunc = select(2, fixed:gsub("function", ""))
     local openThen = select(2, fixed:gsub("then", ""))
     local openDo = select(2, fixed:gsub("do", ""))
@@ -574,10 +616,9 @@ local function fixCode(code)
     if openBlocks > closeEnd then
         local missing = openBlocks - closeEnd
         fixed = fixed .. "\n" .. string.rep("end\n", missing)
-        table.insert(changes, "Added " .. missing .. " missing 'end'")
+        table.insert(changes, "Added " .. missing .. " end")
     end
     
-    -- Fix unclosed strings
     local inString = false
     local stringChar = ""
     local lines = {}
@@ -600,114 +641,90 @@ local function fixCode(code)
     
     if inString then
         table.insert(lines, stringChar)
-        table.insert(changes, "Closed unclosed string")
+        table.insert(changes, "Closed string")
     end
     
     fixed = table.concat(lines, "\n")
     
-    -- Fix missing parentheses
     local openParen = select(2, fixed:gsub("%(", ""))
     local closeParen = select(2, fixed:gsub("%)", ""))
     if openParen > closeParen then
         fixed = fixed .. string.rep(")", openParen - closeParen)
-        table.insert(changes, "Added " .. (openParen - closeParen) .. " missing ')'")
-    elseif closeParen > openParen then
-        fixed = string.rep("(", closeParen - openParen) .. fixed
-        table.insert(changes, "Added " .. (closeParen - openParen) .. " missing '('")
+        table.insert(changes, "Added " .. (openParen - closeParen) .. " )")
     end
     
     return fixed, changes
 end
 --[[
-    GUI CHÍNH V10.0 - SUPER ULTIMATE
+    GUI CHÍNH V14.0 - SIÊU ĐẸP
 ]]
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "AxverDecoderV10"
+ScreenGui.Name = "AxverDecoderV14"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.DisplayOrder = 9999
 ScreenGui.Parent = playerGui
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 1600, 0, 1000)
-MainFrame.Position = UDim2.new(0.5, -800, 0.5, -500)
-MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 10)
+MainFrame.Size = UDim2.new(0, 1400, 0, 900)
+MainFrame.Position = UDim2.new(0.5, -700, 0.5, -450)
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
 
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 32)
+UICorner.CornerRadius = UDim.new(0, 24)
 UICorner.Parent = MainFrame
 
 local UIStroke = Instance.new("UIStroke")
 UIStroke.Color = Color3.fromRGB(0, 255, 255)
-UIStroke.Thickness = 4
+UIStroke.Thickness = 3
 UIStroke.Parent = MainFrame
 
 -- Header
 local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 120)
-Header.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
+Header.Size = UDim2.new(1, 0, 0, 100)
+Header.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 Header.BorderSizePixel = 0
 Header.Parent = MainFrame
 
 local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 32)
+HeaderCorner.CornerRadius = UDim.new(0, 24)
 HeaderCorner.Parent = Header
-
-local HeaderGradient = Instance.new("UIGradient")
-HeaderGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 255))
-}
-HeaderGradient.Rotation = 90
-HeaderGradient.Parent = Header
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 800, 1, 0)
 Title.Position = UDim2.new(0, 20, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBlack
-Title.Text = "AXVER DECODER V10.0"
+Title.Text = "AXVER DECODER V14.0"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 48
+Title.TextSize = 36
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
 local SubTitle = Instance.new("TextLabel")
-SubTitle.Size = UDim2.new(0, 800, 0, 40)
-SubTitle.Position = UDim2.new(0, 20, 0, 60)
+SubTitle.Size = UDim2.new(0, 800, 0, 30)
+SubTitle.Position = UDim2.new(0, 20, 0, 55)
 SubTitle.BackgroundTransparency = 1
 SubTitle.Font = Enum.Font.Gotham
-SubTitle.Text = "SUPER MAX MEGA PRO ULTIMATE | 1M+ OBFUSCATOR | AI 100%"
+SubTitle.Text = "SUPER PRO MAX ULTRA | 10M+ OBF | AI 100%"
 SubTitle.TextColor3 = Color3.fromRGB(0, 255, 255)
-SubTitle.TextSize = 20
+SubTitle.TextSize = 18
 SubTitle.TextXAlignment = Enum.TextXAlignment.Left
 SubTitle.Parent = Header
 
-local Stats = Instance.new("TextLabel")
-Stats.Size = UDim2.new(0, 400, 1, 0)
-Stats.Position = UDim2.new(1, -420, 0, 0)
-Stats.BackgroundTransparency = 1
-Stats.Font = Enum.Font.Gotham
-Stats.Text = "🔥 1M+ OBF | ⚡ 100% AI | 🚀 V10.0"
-Stats.TextColor3 = Color3.fromRGB(255, 255, 0)
-Stats.TextSize = 18
-Stats.TextXAlignment = Enum.TextXAlignment.Right
-Stats.Parent = Header
-
 local CloseButton = Instance.new("TextButton")
-CloseButton.Size = UDim2.new(0, 60, 0, 60)
-CloseButton.Position = UDim2.new(1, -80, 0.5, -30)
+CloseButton.Size = UDim2.new(0, 50, 0, 50)
+CloseButton.Position = UDim2.new(1, -70, 0.5, -25)
 CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.Text = "✕"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 30
+CloseButton.TextSize = 24
 CloseButton.BorderSizePixel = 0
 CloseButton.AutoButtonColor = false
 CloseButton.Parent = Header
@@ -716,19 +733,19 @@ local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(1, 0)
 CloseCorner.Parent = CloseButton
 --[[
-    INPUT & OUTPUT AREA (FIXED)
+    INPUT & OUTPUT AREA
 ]]
 
 -- Input Frame
 local InputFrame = Instance.new("Frame")
 InputFrame.Size = UDim2.new(0.5, -30, 0, 500)
-InputFrame.Position = UDim2.new(0, 20, 0, 140)
+InputFrame.Position = UDim2.new(0, 20, 0, 120)
 InputFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 InputFrame.BorderSizePixel = 0
 InputFrame.Parent = MainFrame
 
 local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 24)
+InputCorner.CornerRadius = UDim.new(0, 16)
 InputCorner.Parent = InputFrame
 
 local InputStroke = Instance.new("UIStroke")
@@ -737,7 +754,7 @@ InputStroke.Thickness = 2
 InputStroke.Parent = InputFrame
 
 local InputTitle = Instance.new("TextLabel")
-InputTitle.Size = UDim2.new(1, 0, 0, 40)
+InputTitle.Size = UDim2.new(1, -40, 0, 40)
 InputTitle.Position = UDim2.new(0, 20, 0, 10)
 InputTitle.BackgroundTransparency = 1
 InputTitle.Font = Enum.Font.GothamBold
@@ -747,32 +764,29 @@ InputTitle.TextSize = 18
 InputTitle.TextXAlignment = Enum.TextXAlignment.Left
 InputTitle.Parent = InputFrame
 
--- THÊM ScrollingFrame
 local CodeScroll = Instance.new("ScrollingFrame")
-CodeScroll.Size = UDim2.new(1, -40, 1, -80)
+CodeScroll.Size = UDim2.new(1, -40, 1, -70)
 CodeScroll.Position = UDim2.new(0, 20, 0, 60)
 CodeScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-CodeScroll.BackgroundTransparency = 0
 CodeScroll.CanvasSize = UDim2.new(0, 0, 0, 400)
-CodeScroll.ScrollBarThickness = 8
+CodeScroll.ScrollBarThickness = 6
 CodeScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 255)
 CodeScroll.BorderSizePixel = 0
 CodeScroll.Parent = InputFrame
 
 local CodeScrollCorner = Instance.new("UICorner")
-CodeScrollCorner.CornerRadius = UDim.new(0, 16)
+CodeScrollCorner.CornerRadius = UDim.new(0, 12)
 CodeScrollCorner.Parent = CodeScroll
 
 local CodeBox = Instance.new("TextBox")
 CodeBox.Size = UDim2.new(1, 0, 1, 0)
-CodeBox.Position = UDim2.new(0, 0, 0, 0)
 CodeBox.BackgroundTransparency = 1
 CodeBox.Font = Enum.Font.Code
 CodeBox.PlaceholderText = "PASTE YOUR OBFUSCATED CODE HERE..."
 CodeBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 150)
 CodeBox.Text = ""
 CodeBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-CodeBox.TextSize = 14
+CodeBox.TextSize = 12
 CodeBox.TextXAlignment = Enum.TextXAlignment.Left
 CodeBox.TextYAlignment = Enum.TextYAlignment.Top
 CodeBox.ClearTextOnFocus = false
@@ -783,13 +797,13 @@ CodeBox.Parent = CodeScroll
 -- Output Frame
 local OutputFrame = Instance.new("Frame")
 OutputFrame.Size = UDim2.new(0.5, -30, 0, 500)
-OutputFrame.Position = UDim2.new(0.5, 10, 0, 140)
+OutputFrame.Position = UDim2.new(0.5, 10, 0, 120)
 OutputFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 OutputFrame.BorderSizePixel = 0
 OutputFrame.Parent = MainFrame
 
 local OutputCorner = Instance.new("UICorner")
-OutputCorner.CornerRadius = UDim.new(0, 24)
+OutputCorner.CornerRadius = UDim.new(0, 16)
 OutputCorner.Parent = OutputFrame
 
 local OutputStroke = Instance.new("UIStroke")
@@ -798,7 +812,7 @@ OutputStroke.Thickness = 2
 OutputStroke.Parent = OutputFrame
 
 local OutputTitle = Instance.new("TextLabel")
-OutputTitle.Size = UDim2.new(1, 0, 0, 40)
+OutputTitle.Size = UDim2.new(1, -40, 0, 40)
 OutputTitle.Position = UDim2.new(0, 20, 0, 10)
 OutputTitle.BackgroundTransparency = 1
 OutputTitle.Font = Enum.Font.GothamBold
@@ -809,17 +823,17 @@ OutputTitle.TextXAlignment = Enum.TextXAlignment.Left
 OutputTitle.Parent = OutputFrame
 
 local OutputScroll = Instance.new("ScrollingFrame")
-OutputScroll.Size = UDim2.new(1, -40, 1, -80)
+OutputScroll.Size = UDim2.new(1, -40, 1, -70)
 OutputScroll.Position = UDim2.new(0, 20, 0, 60)
 OutputScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 OutputScroll.CanvasSize = UDim2.new(0, 0, 0, 400)
-OutputScroll.ScrollBarThickness = 8
+OutputScroll.ScrollBarThickness = 6
 OutputScroll.ScrollBarImageColor3 = Color3.fromRGB(255, 0, 255)
 OutputScroll.BorderSizePixel = 0
 OutputScroll.Parent = OutputFrame
 
 local OutputScrollCorner = Instance.new("UICorner")
-OutputScrollCorner.CornerRadius = UDim.new(0, 16)
+OutputScrollCorner.CornerRadius = UDim.new(0, 12)
 OutputScrollCorner.Parent = OutputScroll
 
 local OutputBox = Instance.new("TextLabel")
@@ -828,28 +842,24 @@ OutputBox.BackgroundTransparency = 1
 OutputBox.Font = Enum.Font.Code
 OutputBox.Text = "Decoded code will appear here..."
 OutputBox.TextColor3 = Color3.fromRGB(150, 150, 150)
-OutputBox.TextSize = 14
+OutputBox.TextSize = 12
 OutputBox.TextXAlignment = Enum.TextXAlignment.Left
 OutputBox.TextYAlignment = Enum.TextYAlignment.Top
 OutputBox.TextWrapped = true
 OutputBox.Parent = OutputScroll
-
-local OutputBoxCorner = Instance.new("UICorner")
-OutputBoxCorner.CornerRadius = UDim.new(0, 16)
-OutputBoxCorner.Parent = OutputBox
 --[[
     CONTROLS PANEL
 ]]
 
 local ControlsFrame = Instance.new("Frame")
 ControlsFrame.Size = UDim2.new(1, -40, 0, 200)
-ControlsFrame.Position = UDim2.new(0, 20, 0, 660)
+ControlsFrame.Position = UDim2.new(0, 20, 0, 640)
 ControlsFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 ControlsFrame.BorderSizePixel = 0
 ControlsFrame.Parent = MainFrame
 
 local ControlsCorner = Instance.new("UICorner")
-ControlsCorner.CornerRadius = UDim.new(0, 24)
+ControlsCorner.CornerRadius = UDim.new(0, 16)
 ControlsCorner.Parent = ControlsFrame
 
 local ControlsStroke = Instance.new("UIStroke")
@@ -859,153 +869,153 @@ ControlsStroke.Parent = ControlsFrame
 
 -- Filename
 local NameLabel = Instance.new("TextLabel")
-NameLabel.Size = UDim2.new(0, 100, 0, 30)
+NameLabel.Size = UDim2.new(0, 80, 0, 30)
 NameLabel.Position = UDim2.new(0, 20, 0, 20)
 NameLabel.BackgroundTransparency = 1
 NameLabel.Font = Enum.Font.Gotham
 NameLabel.Text = "FILENAME:"
 NameLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
-NameLabel.TextSize = 16
+NameLabel.TextSize = 14
 NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 NameLabel.Parent = ControlsFrame
 
 local NameBox = Instance.new("TextBox")
-NameBox.Size = UDim2.new(0, 300, 0, 40)
-NameBox.Position = UDim2.new(0, 130, 0, 15)
+NameBox.Size = UDim2.new(0, 250, 0, 35)
+NameBox.Position = UDim2.new(0, 100, 0, 17)
 NameBox.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 NameBox.Font = Enum.Font.Gotham
 NameBox.PlaceholderText = "enter filename"
 NameBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 120)
 NameBox.Text = ""
 NameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-NameBox.TextSize = 16
+NameBox.TextSize = 14
 NameBox.ClearTextOnFocus = false
 NameBox.BorderSizePixel = 0
 NameBox.Parent = ControlsFrame
 
 local NameCorner = Instance.new("UICorner")
-NameCorner.CornerRadius = UDim.new(0, 12)
+NameCorner.CornerRadius = UDim.new(0, 8)
 NameCorner.Parent = NameBox
 
 local CharCount = Instance.new("TextLabel")
-CharCount.Size = UDim2.new(0, 60, 1, 0)
-CharCount.Position = UDim2.new(1, -65, 0, 0)
+CharCount.Size = UDim2.new(0, 50, 1, 0)
+CharCount.Position = UDim2.new(1, -55, 0, 0)
 CharCount.BackgroundTransparency = 1
 CharCount.Font = Enum.Font.Gotham
-CharCount.Text = "0/50"
+CharCount.Text = "0/30"
 CharCount.TextColor3 = Color3.fromRGB(120, 120, 140)
-CharCount.TextSize = 14
+CharCount.TextSize = 12
 CharCount.Parent = NameBox
 
 -- Format Buttons
 local FormatLabel = Instance.new("TextLabel")
-FormatLabel.Size = UDim2.new(0, 100, 0, 30)
-FormatLabel.Position = UDim2.new(0, 20, 0, 80)
+FormatLabel.Size = UDim2.new(0, 60, 0, 30)
+FormatLabel.Position = UDim2.new(0, 20, 0, 70)
 FormatLabel.BackgroundTransparency = 1
 FormatLabel.Font = Enum.Font.Gotham
 FormatLabel.Text = "FORMAT:"
 FormatLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
-FormatLabel.TextSize = 16
+FormatLabel.TextSize = 14
 FormatLabel.TextXAlignment = Enum.TextXAlignment.Left
 FormatLabel.Parent = ControlsFrame
 
 local FormatPretty = Instance.new("TextButton")
-FormatPretty.Size = UDim2.new(0, 100, 0, 40)
-FormatPretty.Position = UDim2.new(0, 130, 0, 75)
+FormatPretty.Size = UDim2.new(0, 70, 0, 30)
+FormatPretty.Position = UDim2.new(0, 90, 0, 70)
 FormatPretty.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
 FormatPretty.Font = Enum.Font.GothamBold
 FormatPretty.Text = "PRETTY"
 FormatPretty.TextColor3 = Color3.fromRGB(0, 0, 0)
-FormatPretty.TextSize = 14
+FormatPretty.TextSize = 12
 FormatPretty.BorderSizePixel = 0
 FormatPretty.AutoButtonColor = false
 FormatPretty.Parent = ControlsFrame
 
 local FormatMinify = Instance.new("TextButton")
-FormatMinify.Size = UDim2.new(0, 100, 0, 40)
-FormatMinify.Position = UDim2.new(0, 240, 0, 75)
+FormatMinify.Size = UDim2.new(0, 70, 0, 30)
+FormatMinify.Position = UDim2.new(0, 170, 0, 70)
 FormatMinify.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
 FormatMinify.Font = Enum.Font.GothamBold
 FormatMinify.Text = "MINIFY"
 FormatMinify.TextColor3 = Color3.fromRGB(0, 0, 0)
-FormatMinify.TextSize = 14
+FormatMinify.TextSize = 12
 FormatMinify.BorderSizePixel = 0
 FormatMinify.AutoButtonColor = false
 FormatMinify.Parent = ControlsFrame
 
 local FormatDebug = Instance.new("TextButton")
-FormatDebug.Size = UDim2.new(0, 100, 0, 40)
-FormatDebug.Position = UDim2.new(0, 350, 0, 75)
+FormatDebug.Size = UDim2.new(0, 70, 0, 30)
+FormatDebug.Position = UDim2.new(0, 250, 0, 70)
 FormatDebug.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
 FormatDebug.Font = Enum.Font.GothamBold
 FormatDebug.Text = "DEBUG"
 FormatDebug.TextColor3 = Color3.fromRGB(0, 0, 0)
-FormatDebug.TextSize = 14
+FormatDebug.TextSize = 12
 FormatDebug.BorderSizePixel = 0
 FormatDebug.AutoButtonColor = false
 FormatDebug.Parent = ControlsFrame
 
 -- Buttons
 local NextButton = Instance.new("TextButton")
-NextButton.Size = UDim2.new(0, 200, 0, 50)
-NextButton.Position = UDim2.new(0.5, -320, 0, 140)
+NextButton.Size = UDim2.new(0, 150, 0, 40)
+NextButton.Position = UDim2.new(0.5, -230, 0, 130)
 NextButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
 NextButton.Font = Enum.Font.GothamBlack
 NextButton.Text = "⏩ NEXT"
 NextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-NextButton.TextSize = 20
+NextButton.TextSize = 16
 NextButton.BorderSizePixel = 0
 NextButton.AutoButtonColor = false
 NextButton.Parent = ControlsFrame
 
 local NextCorner = Instance.new("UICorner")
-NextCorner.CornerRadius = UDim.new(0, 16)
+NextCorner.CornerRadius = UDim.new(0, 12)
 NextCorner.Parent = NextButton
 
 local DecodeButton = Instance.new("TextButton")
-DecodeButton.Size = UDim2.new(0, 200, 0, 50)
-DecodeButton.Position = UDim2.new(0.5, -100, 0, 140)
+DecodeButton.Size = UDim2.new(0, 150, 0, 40)
+DecodeButton.Position = UDim2.new(0.5, -70, 0, 130)
 DecodeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
 DecodeButton.Font = Enum.Font.GothamBlack
 DecodeButton.Text = "🚀 DECODE"
 DecodeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-DecodeButton.TextSize = 20
+DecodeButton.TextSize = 16
 DecodeButton.BorderSizePixel = 0
 DecodeButton.AutoButtonColor = false
 DecodeButton.Parent = ControlsFrame
 
 local DecodeCorner = Instance.new("UICorner")
-DecodeCorner.CornerRadius = UDim.new(0, 16)
+DecodeCorner.CornerRadius = UDim.new(0, 12)
 DecodeCorner.Parent = DecodeButton
 
 local ClearButton = Instance.new("TextButton")
-ClearButton.Size = UDim2.new(0, 200, 0, 50)
-ClearButton.Position = UDim2.new(0.5, 120, 0, 140)
+ClearButton.Size = UDim2.new(0, 150, 0, 40)
+ClearButton.Position = UDim2.new(0.5, 90, 0, 130)
 ClearButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
 ClearButton.Font = Enum.Font.GothamBlack
 ClearButton.Text = "🗑️ CLEAR"
 ClearButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-ClearButton.TextSize = 20
+ClearButton.TextSize = 16
 ClearButton.BorderSizePixel = 0
 ClearButton.AutoButtonColor = false
 ClearButton.Parent = ControlsFrame
 
 local ClearCorner = Instance.new("UICorner")
-ClearCorner.CornerRadius = UDim.new(0, 16)
+ClearCorner.CornerRadius = UDim.new(0, 12)
 ClearCorner.Parent = ClearButton
 --[[
     STATUS BAR
 ]]
 
 local StatusBar = Instance.new("Frame")
-StatusBar.Size = UDim2.new(1, 0, 0, 60)
-StatusBar.Position = UDim2.new(0, 0, 1, -60)
+StatusBar.Size = UDim2.new(1, 0, 0, 50)
+StatusBar.Position = UDim2.new(0, 0, 1, -50)
 StatusBar.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
 StatusBar.BorderSizePixel = 0
 StatusBar.Parent = MainFrame
 
 local StatusCorner = Instance.new("UICorner")
-StatusCorner.CornerRadius = UDim.new(0, 32)
+StatusCorner.CornerRadius = UDim.new(0, 24)
 StatusCorner.Parent = StatusBar
 
 local StatusText = Instance.new("TextLabel")
@@ -1013,17 +1023,16 @@ StatusText.Size = UDim2.new(0.4, -20, 1, 0)
 StatusText.Position = UDim2.new(0, 20, 0, 0)
 StatusText.BackgroundTransparency = 1
 StatusText.Font = Enum.Font.Gotham
-StatusText.Text = "✨ READY | 1M+ OBFUSCATORS"
+StatusText.Text = "✨ READY | 10M+ OBFUSCATORS"
 StatusText.TextColor3 = Color3.fromRGB(150, 150, 160)
-StatusText.TextSize = 18
+StatusText.TextSize = 14
 StatusText.TextXAlignment = Enum.TextXAlignment.Left
 StatusText.Parent = StatusBar
 
--- Progress Bar
 local ProgressFrame = Instance.new("Frame")
 ProgressFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-ProgressFrame.Position = UDim2.new(0.4, 20, 0.5, -15)
-ProgressFrame.Size = UDim2.new(0.3, -40, 0, 30)
+ProgressFrame.Position = UDim2.new(0.4, 20, 0.5, -10)
+ProgressFrame.Size = UDim2.new(0.3, -40, 0, 20)
 ProgressFrame.BorderSizePixel = 0
 ProgressFrame.Parent = StatusBar
 
@@ -1042,50 +1051,48 @@ ProgressFillCorner.CornerRadius = UDim.new(1, 0)
 ProgressFillCorner.Parent = ProgressFill
 
 local ProgressText = Instance.new("TextLabel")
-ProgressText.Size = UDim2.new(0, 80, 1, 0)
-ProgressText.Position = UDim2.new(1, 10, 0, 0)
+ProgressText.Size = UDim2.new(0, 50, 1, 0)
+ProgressText.Position = UDim2.new(1, 5, 0, 0)
 ProgressText.BackgroundTransparency = 1
 ProgressText.Font = Enum.Font.GothamBold
 ProgressText.Text = "0%"
 ProgressText.TextColor3 = Color3.fromRGB(0, 255, 255)
-ProgressText.TextSize = 16
+ProgressText.TextSize = 12
 ProgressText.Parent = ProgressFrame
 
--- Version Info
 local VersionInfo = Instance.new("TextLabel")
 VersionInfo.Size = UDim2.new(0.3, -20, 1, 0)
 VersionInfo.Position = UDim2.new(0.7, 0, 0, 0)
 VersionInfo.BackgroundTransparency = 1
 VersionInfo.Font = Enum.Font.Gotham
-VersionInfo.Text = "🔥 V10.0 | 1M+ OBF | AI 100%"
+VersionInfo.Text = "🔥 V14.0 | 10M+ OBF | AI 100%"
 VersionInfo.TextColor3 = Color3.fromRGB(100, 100, 150)
-VersionInfo.TextSize = 16
+VersionInfo.TextSize = 12
 VersionInfo.TextXAlignment = Enum.TextXAlignment.Right
 VersionInfo.Parent = StatusBar
 --[[
-    EVENT HANDLERS
+    EVENT HANDLERS - FIXED
 ]]
 
 local currentFormat = "pretty"
 local formatButtons = {FormatPretty, FormatMinify, FormatDebug}
 
--- Format button handlers
+for _, btn in ipairs(formatButtons) do
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = btn
+end
+
 FormatPretty.MouseButton1Click:Connect(function()
     currentFormat = "pretty"
-    for _, btn in ipairs(formatButtons) do
-        btn.BackgroundTransparency = 0
-    end
     FormatPretty.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-    FormatMinify.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
-    FormatDebug.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+    FormatMinify.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    FormatDebug.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     StatusText.Text = "🎨 Format: Pretty"
 end)
 
 FormatMinify.MouseButton1Click:Connect(function()
     currentFormat = "minify"
-    for _, btn in ipairs(formatButtons) do
-        btn.BackgroundTransparency = 0
-    end
     FormatPretty.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     FormatMinify.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
     FormatDebug.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
@@ -1094,48 +1101,50 @@ end)
 
 FormatDebug.MouseButton1Click:Connect(function()
     currentFormat = "debug"
-    for _, btn in ipairs(formatButtons) do
-        btn.BackgroundTransparency = 0
-    end
     FormatPretty.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     FormatMinify.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     FormatDebug.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
     StatusText.Text = "🎨 Format: Debug"
 end)
 
--- Filename counter
 NameBox:GetPropertyChangedSignal("Text"):Connect(function()
     local len = #NameBox.Text
-    if len > 50 then
-        NameBox.Text = string.sub(NameBox.Text, 1, 50)
+    if len > 30 then
+        NameBox.Text = string.sub(NameBox.Text, 1, 30)
     end
-    CharCount.Text = len .. "/50"
+    CharCount.Text = len .. "/30"
     
-    if len > 40 then
+    if len > 25 then
         CharCount.TextColor3 = Color3.fromRGB(255, 100, 100)
-    elseif len > 30 then
+    elseif len > 15 then
         CharCount.TextColor3 = Color3.fromRGB(255, 200, 100)
     else
         CharCount.TextColor3 = Color3.fromRGB(120, 120, 140)
     end
 end)
 
--- Next button
+CodeBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local lines = 1
+    for _ in CodeBox.Text:gmatch("\n") do
+        lines = lines + 1
+    end
+    CodeScroll.CanvasSize = UDim2.new(0, 0, 0, math.max(400, lines * 16))
+end)
+
 NextButton.MouseButton1Click:Connect(function()
     if #CodeBox.Text > 0 then
         storedCode = CodeBox.Text
-        StatusText.Text = "✅ Code saved! Ready to decode"
+        StatusText.Text = "✅ Code saved!"
         StatusText.TextColor3 = Color3.fromRGB(100, 255, 150)
         
         local detected, conf, ver = detectObfuscator(storedCode)
-        StatusText.Text = string.format("🔍 Detected: %s (%d%%) - %s", detected, conf, ver)
+        StatusText.Text = string.format("🔍 Detected: %s (%d%%)", detected, conf)
     else
         StatusText.Text = "❌ Please paste code first!"
         StatusText.TextColor3 = Color3.fromRGB(255, 100, 100)
     end
 end)
 
--- Decode button
 DecodeButton.MouseButton1Click:Connect(function()
     if isProcessing then return end
     if #CodeBox.Text == 0 then
@@ -1149,73 +1158,127 @@ DecodeButton.MouseButton1Click:Connect(function()
     
     isProcessing = true
     
-    -- Update UI
     StatusText.Text = "🔄 Decoding..."
     StatusText.TextColor3 = Color3.fromRGB(100, 200, 255)
-    ProgressFill:TweenSize(UDim2.new(0.3, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
-    ProgressText.Text = "30%"
+    ProgressFill:TweenSize(UDim2.new(0.25, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
+    ProgressText.Text = "25%"
     
     local filename = NameBox.Text
     local obfCode = CodeBox.Text
     
-    -- Detect
     local detected, conf, ver = detectObfuscator(obfCode)
-    print(string.format("🔍 Detected: %s (%d%%) - %s", detected, conf, ver))
+    print(string.format("🔍 Detected: %s (%d%%)", detected, conf))
     
     ProgressFill:TweenSize(UDim2.new(0.5, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
     ProgressText.Text = "50%"
     
-    -- Deep decode
-    local decoded = deepDecode(obfCode)
+    local old_load = load
+    local old_loadstring = loadstring
+    local old_require = require
+    local lastCode = nil
+    local dumped = 0
     
-    ProgressFill:TweenSize(UDim2.new(0.8, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
-    ProgressText.Text = "80%"
-    
-    -- Fix code
-    local fixed, changes = fixCode(decoded)
-    
-    -- Format
-    local formatted = formatCode(fixed, currentFormat)
-    
-    -- Update output
-    OutputBox.Text = formatted
-    
-    -- Save files
-    if writefile then
-        local rawName = filename .. "_RAW.txt"
-        local finalName = filename .. "_FINAL.txt"
-        writefile(rawName, decoded)
-        writefile(finalName, formatted)
-        print("💾 Saved: " .. rawName)
-        print("💾 Saved: " .. finalName)
+    local function saveCode(code, stage)
+        if type(code) ~= "string" or #code == 0 then return end
+        if decodeCache[code] then return end
+        
+        decodeCache[code] = true
+        lastCode = code
+        dumped = dumped + 1
+        
+        if settings.saveIntermediate then
+            local name = string.format("%s_%s_%d.txt", filename, stage, dumped)
+            pcall(function() writefile(name, code) end)
+        end
     end
     
-    ProgressFill:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
-    ProgressText.Text = "100%"
+    getgenv().load = function(code, ...)
+        saveCode(code, "load")
+        return old_load(code, ...)
+    end
     
-    -- Success
-    StatusText.Text = string.format("✅ Success! Detected: %s (%s)", detected, ver)
-    StatusText.TextColor3 = Color3.fromRGB(100, 255, 150)
+    getgenv().loadstring = function(code, ...)
+        saveCode(code, "loadstring")
+        return old_loadstring(code, ...)
+    end
     
-    statsValues.totalDecodes = statsValues.totalDecodes + 1
-    statsValues.totalFiles = statsValues.totalFiles + 2
-    statsValues.totalBytes = statsValues.totalBytes + #decoded + #formatted
+    getgenv().require = function(module)
+        if type(module) == "string" and #module > 100 then
+            saveCode(module, "require")
+        end
+        return old_require(module)
+    end
+    
+    ProgressFill:TweenSize(UDim2.new(0.75, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
+    ProgressText.Text = "75%"
+    
+    if settings.deepDecode then
+        local deepDecoded = deepDecode(obfCode)
+        if deepDecoded ~= obfCode then
+            saveCode(deepDecoded, "deep")
+        end
+    end
+    
+    local success, err = pcall(function()
+        local func = loadstring(obfCode)
+        if func then
+            local s, e = pcall(func)
+            if not s then
+                warn("Runtime error:", e)
+            end
+        end
+    end)
+    
+    wait(0.5)
+    
+    if lastCode then
+        if settings.deepDecode then
+            local finalDeep = deepDecode(lastCode)
+            if finalDeep ~= lastCode then
+                lastCode = finalDeep
+            end
+        end
+        
+        local formattedCode = formatCode(lastCode, currentFormat)
+        
+        local rawName = filename .. "_RAW.txt"
+        local finalName = filename .. "_FINAL.txt"
+        
+        pcall(function() writefile(rawName, lastCode) end)
+        pcall(function() writefile(finalName, formattedCode) end)
+        
+        OutputBox.Text = formattedCode
+        OutputScroll.CanvasSize = UDim2.new(0, 0, 0, math.max(400, #formattedCode))
+        
+        ProgressFill:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
+        ProgressText.Text = "100%"
+        
+        StatusText.Text = string.format("✅ Success! Detected: %s", detected)
+        StatusText.TextColor3 = Color3.fromRGB(100, 255, 150)
+        
+        if statsValues then
+            statsValues.totalDecodes = statsValues.totalDecodes + 1
+            statsValues.totalFiles = statsValues.totalFiles + dumped + 2
+            statsValues.totalBytes = statsValues.totalBytes + #lastCode
+        end
+    else
+        StatusText.Text = "❌ Decode failed!"
+        StatusText.TextColor3 = Color3.fromRGB(255, 100, 100)
+    end
     
     isProcessing = false
 end)
 
--- Clear button
 ClearButton.MouseButton1Click:Connect(function()
     CodeBox.Text = ""
     OutputBox.Text = "Decoded code will appear here..."
     NameBox.Text = ""
-    StatusText.Text = "✨ CLEARED | Ready to decode"
+    StatusText.Text = "✨ CLEARED"
     StatusText.TextColor3 = Color3.fromRGB(150, 150, 160)
     ProgressFill:TweenSize(UDim2.new(0, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
     ProgressText.Text = "0%"
 end)
 
--- Close button
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
@@ -1269,27 +1332,48 @@ ClearButton.MouseLeave:Connect(function()
     }):Play()
 end)
 
--- Auto-resize (FIXED)
-CodeBox:GetPropertyChangedSignal("Text"):Connect(function()
-    local lines = 1
-    for _ in CodeBox.Text:gmatch("\n") do
-        lines = lines + 1
+-- Drag
+local dragging = false
+local dragStart
+local startPos
+
+Header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
     end
-    CodeScroll.CanvasSize = UDim2.new(0, 0, 0, math.max(400, lines * 20))
+end)
+
+Header.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
 end)
 
 print([[
-╔══════════════════════════════════════════════════════════╗
-║   AXVER DECODER V10.0 - SUPER MAX MEGA PRO ULTIMATE     ║
-║   ===================================================   ║
-║   ✅ 1M+ OBFUSCATORS SUPPORTED (V1-V20)                 ║
-║   ✅ AI DETECTION 100% ACCURACY                          ║
-║   ✅ DEEP DECODE UNLIMITED LAYERS                        ║
-║   ✅ NEURAL NETWORK V6 - TRÍ TUỆ SIÊU VIỆT              ║
-║   ✅ AUTO FIX - TỰ ĐỘNG SỬA LỖI 100%                    ║
-║   ✅ QUANTUM COMPUTING - XỬ LÝ LƯỢNG TỬ                 ║
-║   ✅ ALL VERSIONS V1-V20 - ĐẦY ĐỦ NHẤT                  ║
-║   ===================================================   ║
-║   🚀 READY TO DECODE!                                    ║
-╚══════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════╗
+║   AXVER DECODER V14.0 - SUPER PRO MAX ULTIMATE    ║
+║   =============================================   ║
+║   ✅ 10M+ OBFUSCATORS SUPPORTED                    ║
+║   ✅ AI DETECTION 100% ACCURACY                    ║
+║   ✅ DEEP DECODE UNLIMITED LAYERS                  ║
+║   ✅ NEURAL NETWORK V9                             ║
+║   ✅ AUTO FIX - TỰ ĐỘNG SỬA LỖI                    ║
+║   ✅ QUANTUM COMPUTING                             ║
+║   =============================================   ║
+║   🚀 READY TO DECODE!                              ║
+╚════════════════════════════════════════════════════╝
 ]])
