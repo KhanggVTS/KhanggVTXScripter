@@ -656,7 +656,7 @@ local function fixCode(code)
     return fixed, changes
 end
 --[[
-    GUI CHÍNH V14.0 - SIÊU ĐẸP
+    GUI CHÍNH V14.1 - KÍCH THƯỚC VỪA
 ]]
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -667,8 +667,8 @@ ScreenGui.DisplayOrder = 9999
 ScreenGui.Parent = playerGui
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 1400, 0, 900)
-MainFrame.Position = UDim2.new(0.5, -700, 0.5, -450)
+MainFrame.Size = UDim2.new(0, 800, 0, 600)  -- Giảm từ 1400x900 xuống 800x600
+MainFrame.Position = UDim2.new(0.5, -400, 0.5, -300)  -- Căn giữa
 MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
@@ -676,55 +676,55 @@ MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
 
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 24)
+UICorner.CornerRadius = UDim.new(0, 16)  -- Bo góc nhỏ hơn
 UICorner.Parent = MainFrame
 
 local UIStroke = Instance.new("UIStroke")
 UIStroke.Color = Color3.fromRGB(0, 255, 255)
-UIStroke.Thickness = 3
+UIStroke.Thickness = 2
 UIStroke.Parent = MainFrame
 
 -- Header
 local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 100)
+Header.Size = UDim2.new(1, 0, 0, 60)  -- Header cao 60px
 Header.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 Header.BorderSizePixel = 0
 Header.Parent = MainFrame
 
 local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 24)
+HeaderCorner.CornerRadius = UDim.new(0, 16)
 HeaderCorner.Parent = Header
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0, 800, 1, 0)
-Title.Position = UDim2.new(0, 20, 0, 0)
+Title.Size = UDim2.new(0, 400, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBlack
 Title.Text = "AXVER DECODER V14.0"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 36
+Title.TextSize = 24  -- Chữ nhỏ hơn
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
 local SubTitle = Instance.new("TextLabel")
-SubTitle.Size = UDim2.new(0, 800, 0, 30)
-SubTitle.Position = UDim2.new(0, 20, 0, 55)
+SubTitle.Size = UDim2.new(0, 400, 0, 20)
+SubTitle.Position = UDim2.new(0, 15, 0, 32)
 SubTitle.BackgroundTransparency = 1
 SubTitle.Font = Enum.Font.Gotham
-SubTitle.Text = "SUPER PRO MAX ULTRA | 10M+ OBF | AI 100%"
+SubTitle.Text = "10M+ OBF | AI 100%"
 SubTitle.TextColor3 = Color3.fromRGB(0, 255, 255)
-SubTitle.TextSize = 18
+SubTitle.TextSize = 12
 SubTitle.TextXAlignment = Enum.TextXAlignment.Left
 SubTitle.Parent = Header
 
 local CloseButton = Instance.new("TextButton")
-CloseButton.Size = UDim2.new(0, 50, 0, 50)
-CloseButton.Position = UDim2.new(1, -70, 0.5, -25)
+CloseButton.Size = UDim2.new(0, 35, 0, 35)
+CloseButton.Position = UDim2.new(1, -45, 0.5, -17.5)
 CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.Text = "✕"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 24
+CloseButton.TextSize = 18
 CloseButton.BorderSizePixel = 0
 CloseButton.AutoButtonColor = false
 CloseButton.Parent = Header
@@ -733,60 +733,60 @@ local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(1, 0)
 CloseCorner.Parent = CloseButton
 --[[
-    INPUT & OUTPUT AREA
+    INPUT & OUTPUT AREA - KÍCH THƯỚC VỪA
 ]]
 
 -- Input Frame
 local InputFrame = Instance.new("Frame")
-InputFrame.Size = UDim2.new(0.5, -30, 0, 500)
-InputFrame.Position = UDim2.new(0, 20, 0, 120)
+InputFrame.Size = UDim2.new(0.5, -10, 0, 350)  -- Giảm chiều cao
+InputFrame.Position = UDim2.new(0, 10, 0, 70)
 InputFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 InputFrame.BorderSizePixel = 0
 InputFrame.Parent = MainFrame
 
 local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 16)
+InputCorner.CornerRadius = UDim.new(0, 12)
 InputCorner.Parent = InputFrame
 
 local InputStroke = Instance.new("UIStroke")
 InputStroke.Color = Color3.fromRGB(0, 255, 255)
-InputStroke.Thickness = 2
+InputStroke.Thickness = 1
 InputStroke.Parent = InputFrame
 
 local InputTitle = Instance.new("TextLabel")
-InputTitle.Size = UDim2.new(1, -40, 0, 40)
-InputTitle.Position = UDim2.new(0, 20, 0, 10)
+InputTitle.Size = UDim2.new(1, -20, 0, 25)
+InputTitle.Position = UDim2.new(0, 10, 0, 5)
 InputTitle.BackgroundTransparency = 1
 InputTitle.Font = Enum.Font.GothamBold
 InputTitle.Text = "📥 INPUT CODE"
 InputTitle.TextColor3 = Color3.fromRGB(0, 255, 255)
-InputTitle.TextSize = 18
+InputTitle.TextSize = 14
 InputTitle.TextXAlignment = Enum.TextXAlignment.Left
 InputTitle.Parent = InputFrame
 
 local CodeScroll = Instance.new("ScrollingFrame")
-CodeScroll.Size = UDim2.new(1, -40, 1, -70)
-CodeScroll.Position = UDim2.new(0, 20, 0, 60)
+CodeScroll.Size = UDim2.new(1, -20, 1, -45)
+CodeScroll.Position = UDim2.new(0, 10, 0, 35)
 CodeScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-CodeScroll.CanvasSize = UDim2.new(0, 0, 0, 400)
-CodeScroll.ScrollBarThickness = 6
+CodeScroll.CanvasSize = UDim2.new(0, 0, 0, 250)
+CodeScroll.ScrollBarThickness = 4
 CodeScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 255)
 CodeScroll.BorderSizePixel = 0
 CodeScroll.Parent = InputFrame
 
 local CodeScrollCorner = Instance.new("UICorner")
-CodeScrollCorner.CornerRadius = UDim.new(0, 12)
+CodeScrollCorner.CornerRadius = UDim.new(0, 8)
 CodeScrollCorner.Parent = CodeScroll
 
 local CodeBox = Instance.new("TextBox")
 CodeBox.Size = UDim2.new(1, 0, 1, 0)
 CodeBox.BackgroundTransparency = 1
 CodeBox.Font = Enum.Font.Code
-CodeBox.PlaceholderText = "PASTE YOUR OBFUSCATED CODE HERE..."
+CodeBox.PlaceholderText = "Paste your obfuscated code here..."
 CodeBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 150)
 CodeBox.Text = ""
 CodeBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-CodeBox.TextSize = 12
+CodeBox.TextSize = 11
 CodeBox.TextXAlignment = Enum.TextXAlignment.Left
 CodeBox.TextYAlignment = Enum.TextYAlignment.Top
 CodeBox.ClearTextOnFocus = false
@@ -796,44 +796,44 @@ CodeBox.Parent = CodeScroll
 
 -- Output Frame
 local OutputFrame = Instance.new("Frame")
-OutputFrame.Size = UDim2.new(0.5, -30, 0, 500)
-OutputFrame.Position = UDim2.new(0.5, 10, 0, 120)
+OutputFrame.Size = UDim2.new(0.5, -10, 0, 350)
+OutputFrame.Position = UDim2.new(0.5, 0, 0, 70)
 OutputFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 OutputFrame.BorderSizePixel = 0
 OutputFrame.Parent = MainFrame
 
 local OutputCorner = Instance.new("UICorner")
-OutputCorner.CornerRadius = UDim.new(0, 16)
+OutputCorner.CornerRadius = UDim.new(0, 12)
 OutputCorner.Parent = OutputFrame
 
 local OutputStroke = Instance.new("UIStroke")
 OutputStroke.Color = Color3.fromRGB(255, 0, 255)
-OutputStroke.Thickness = 2
+OutputStroke.Thickness = 1
 OutputStroke.Parent = OutputFrame
 
 local OutputTitle = Instance.new("TextLabel")
-OutputTitle.Size = UDim2.new(1, -40, 0, 40)
-OutputTitle.Position = UDim2.new(0, 20, 0, 10)
+OutputTitle.Size = UDim2.new(1, -20, 0, 25)
+OutputTitle.Position = UDim2.new(0, 10, 0, 5)
 OutputTitle.BackgroundTransparency = 1
 OutputTitle.Font = Enum.Font.GothamBold
 OutputTitle.Text = "📤 OUTPUT PREVIEW"
 OutputTitle.TextColor3 = Color3.fromRGB(255, 0, 255)
-OutputTitle.TextSize = 18
+OutputTitle.TextSize = 14
 OutputTitle.TextXAlignment = Enum.TextXAlignment.Left
 OutputTitle.Parent = OutputFrame
 
 local OutputScroll = Instance.new("ScrollingFrame")
-OutputScroll.Size = UDim2.new(1, -40, 1, -70)
-OutputScroll.Position = UDim2.new(0, 20, 0, 60)
+OutputScroll.Size = UDim2.new(1, -20, 1, -45)
+OutputScroll.Position = UDim2.new(0, 10, 0, 35)
 OutputScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-OutputScroll.CanvasSize = UDim2.new(0, 0, 0, 400)
-OutputScroll.ScrollBarThickness = 6
+OutputScroll.CanvasSize = UDim2.new(0, 0, 0, 250)
+OutputScroll.ScrollBarThickness = 4
 OutputScroll.ScrollBarImageColor3 = Color3.fromRGB(255, 0, 255)
 OutputScroll.BorderSizePixel = 0
 OutputScroll.Parent = OutputFrame
 
 local OutputScrollCorner = Instance.new("UICorner")
-OutputScrollCorner.CornerRadius = UDim.new(0, 12)
+OutputScrollCorner.CornerRadius = UDim.new(0, 8)
 OutputScrollCorner.Parent = OutputScroll
 
 local OutputBox = Instance.new("TextLabel")
@@ -842,197 +842,210 @@ OutputBox.BackgroundTransparency = 1
 OutputBox.Font = Enum.Font.Code
 OutputBox.Text = "Decoded code will appear here..."
 OutputBox.TextColor3 = Color3.fromRGB(150, 150, 150)
-OutputBox.TextSize = 12
+OutputBox.TextSize = 11
 OutputBox.TextXAlignment = Enum.TextXAlignment.Left
 OutputBox.TextYAlignment = Enum.TextYAlignment.Top
 OutputBox.TextWrapped = true
 OutputBox.Parent = OutputScroll
 --[[
-    CONTROLS PANEL
+    CONTROLS PANEL - KÍCH THƯỚC VỪA
 ]]
 
 local ControlsFrame = Instance.new("Frame")
-ControlsFrame.Size = UDim2.new(1, -40, 0, 200)
-ControlsFrame.Position = UDim2.new(0, 20, 0, 640)
+ControlsFrame.Size = UDim2.new(1, -20, 0, 140)
+ControlsFrame.Position = UDim2.new(0, 10, 0, 430)
 ControlsFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 ControlsFrame.BorderSizePixel = 0
 ControlsFrame.Parent = MainFrame
 
 local ControlsCorner = Instance.new("UICorner")
-ControlsCorner.CornerRadius = UDim.new(0, 16)
+ControlsCorner.CornerRadius = UDim.new(0, 12)
 ControlsCorner.Parent = ControlsFrame
 
 local ControlsStroke = Instance.new("UIStroke")
 ControlsStroke.Color = Color3.fromRGB(255, 255, 0)
-ControlsStroke.Thickness = 2
+ControlsStroke.Thickness = 1
 ControlsStroke.Parent = ControlsFrame
 
 -- Filename
 local NameLabel = Instance.new("TextLabel")
-NameLabel.Size = UDim2.new(0, 80, 0, 30)
-NameLabel.Position = UDim2.new(0, 20, 0, 20)
+NameLabel.Size = UDim2.new(0, 70, 0, 25)
+NameLabel.Position = UDim2.new(0, 10, 0, 10)
 NameLabel.BackgroundTransparency = 1
 NameLabel.Font = Enum.Font.Gotham
-NameLabel.Text = "FILENAME:"
+NameLabel.Text = "FILE:"
 NameLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
-NameLabel.TextSize = 14
+NameLabel.TextSize = 12
 NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 NameLabel.Parent = ControlsFrame
 
 local NameBox = Instance.new("TextBox")
-NameBox.Size = UDim2.new(0, 250, 0, 35)
-NameBox.Position = UDim2.new(0, 100, 0, 17)
+NameBox.Size = UDim2.new(0, 200, 0, 28)
+NameBox.Position = UDim2.new(0, 80, 0, 8)
 NameBox.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 NameBox.Font = Enum.Font.Gotham
-NameBox.PlaceholderText = "enter filename"
+NameBox.PlaceholderText = "filename"
 NameBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 120)
 NameBox.Text = ""
 NameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-NameBox.TextSize = 14
+NameBox.TextSize = 12
 NameBox.ClearTextOnFocus = false
 NameBox.BorderSizePixel = 0
 NameBox.Parent = ControlsFrame
 
 local NameCorner = Instance.new("UICorner")
-NameCorner.CornerRadius = UDim.new(0, 8)
+NameCorner.CornerRadius = UDim.new(0, 6)
 NameCorner.Parent = NameBox
 
 local CharCount = Instance.new("TextLabel")
-CharCount.Size = UDim2.new(0, 50, 1, 0)
-CharCount.Position = UDim2.new(1, -55, 0, 0)
+CharCount.Size = UDim2.new(0, 40, 1, 0)
+CharCount.Position = UDim2.new(1, -45, 0, 0)
 CharCount.BackgroundTransparency = 1
 CharCount.Font = Enum.Font.Gotham
 CharCount.Text = "0/30"
 CharCount.TextColor3 = Color3.fromRGB(120, 120, 140)
-CharCount.TextSize = 12
+CharCount.TextSize = 10
 CharCount.Parent = NameBox
 
 -- Format Buttons
 local FormatLabel = Instance.new("TextLabel")
-FormatLabel.Size = UDim2.new(0, 60, 0, 30)
-FormatLabel.Position = UDim2.new(0, 20, 0, 70)
+FormatLabel.Size = UDim2.new(0, 50, 0, 25)
+FormatLabel.Position = UDim2.new(0, 10, 0, 45)
 FormatLabel.BackgroundTransparency = 1
 FormatLabel.Font = Enum.Font.Gotham
-FormatLabel.Text = "FORMAT:"
+FormatLabel.Text = "FMT:"
 FormatLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
-FormatLabel.TextSize = 14
+FormatLabel.TextSize = 12
 FormatLabel.TextXAlignment = Enum.TextXAlignment.Left
 FormatLabel.Parent = ControlsFrame
 
 local FormatPretty = Instance.new("TextButton")
-FormatPretty.Size = UDim2.new(0, 70, 0, 30)
-FormatPretty.Position = UDim2.new(0, 90, 0, 70)
+FormatPretty.Size = UDim2.new(0, 60, 0, 25)
+FormatPretty.Position = UDim2.new(0, 70, 0, 45)
 FormatPretty.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
 FormatPretty.Font = Enum.Font.GothamBold
 FormatPretty.Text = "PRETTY"
 FormatPretty.TextColor3 = Color3.fromRGB(0, 0, 0)
-FormatPretty.TextSize = 12
+FormatPretty.TextSize = 10
 FormatPretty.BorderSizePixel = 0
 FormatPretty.AutoButtonColor = false
 FormatPretty.Parent = ControlsFrame
 
 local FormatMinify = Instance.new("TextButton")
-FormatMinify.Size = UDim2.new(0, 70, 0, 30)
-FormatMinify.Position = UDim2.new(0, 170, 0, 70)
+FormatMinify.Size = UDim2.new(0, 60, 0, 25)
+FormatMinify.Position = UDim2.new(0, 140, 0, 45)
 FormatMinify.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
 FormatMinify.Font = Enum.Font.GothamBold
 FormatMinify.Text = "MINIFY"
 FormatMinify.TextColor3 = Color3.fromRGB(0, 0, 0)
-FormatMinify.TextSize = 12
+FormatMinify.TextSize = 10
 FormatMinify.BorderSizePixel = 0
 FormatMinify.AutoButtonColor = false
 FormatMinify.Parent = ControlsFrame
 
 local FormatDebug = Instance.new("TextButton")
-FormatDebug.Size = UDim2.new(0, 70, 0, 30)
-FormatDebug.Position = UDim2.new(0, 250, 0, 70)
+FormatDebug.Size = UDim2.new(0, 60, 0, 25)
+FormatDebug.Position = UDim2.new(0, 210, 0, 45)
 FormatDebug.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
 FormatDebug.Font = Enum.Font.GothamBold
 FormatDebug.Text = "DEBUG"
 FormatDebug.TextColor3 = Color3.fromRGB(0, 0, 0)
-FormatDebug.TextSize = 12
+FormatDebug.TextSize = 10
 FormatDebug.BorderSizePixel = 0
 FormatDebug.AutoButtonColor = false
 FormatDebug.Parent = ControlsFrame
 
 -- Buttons
 local NextButton = Instance.new("TextButton")
-NextButton.Size = UDim2.new(0, 150, 0, 40)
-NextButton.Position = UDim2.new(0.5, -230, 0, 130)
+NextButton.Size = UDim2.new(0, 100, 0, 32)
+NextButton.Position = UDim2.new(0.5, -155, 0, 90)
 NextButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
 NextButton.Font = Enum.Font.GothamBlack
 NextButton.Text = "⏩ NEXT"
 NextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-NextButton.TextSize = 16
+NextButton.TextSize = 14
 NextButton.BorderSizePixel = 0
 NextButton.AutoButtonColor = false
 NextButton.Parent = ControlsFrame
 
 local NextCorner = Instance.new("UICorner")
-NextCorner.CornerRadius = UDim.new(0, 12)
+NextCorner.CornerRadius = UDim.new(0, 8)
 NextCorner.Parent = NextButton
 
 local DecodeButton = Instance.new("TextButton")
-DecodeButton.Size = UDim2.new(0, 150, 0, 40)
-DecodeButton.Position = UDim2.new(0.5, -70, 0, 130)
+DecodeButton.Size = UDim2.new(0, 100, 0, 32)
+DecodeButton.Position = UDim2.new(0.5, -50, 0, 90)
 DecodeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
 DecodeButton.Font = Enum.Font.GothamBlack
 DecodeButton.Text = "🚀 DECODE"
 DecodeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-DecodeButton.TextSize = 16
+DecodeButton.TextSize = 14
 DecodeButton.BorderSizePixel = 0
 DecodeButton.AutoButtonColor = false
 DecodeButton.Parent = ControlsFrame
 
 local DecodeCorner = Instance.new("UICorner")
-DecodeCorner.CornerRadius = UDim.new(0, 12)
+DecodeCorner.CornerRadius = UDim.new(0, 8)
 DecodeCorner.Parent = DecodeButton
 
 local ClearButton = Instance.new("TextButton")
-ClearButton.Size = UDim2.new(0, 150, 0, 40)
-ClearButton.Position = UDim2.new(0.5, 90, 0, 130)
+ClearButton.Size = UDim2.new(0, 100, 0, 32)
+ClearButton.Position = UDim2.new(0.5, 55, 0, 90)
 ClearButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
 ClearButton.Font = Enum.Font.GothamBlack
 ClearButton.Text = "🗑️ CLEAR"
 ClearButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-ClearButton.TextSize = 16
+ClearButton.TextSize = 14
 ClearButton.BorderSizePixel = 0
 ClearButton.AutoButtonColor = false
 ClearButton.Parent = ControlsFrame
 
 local ClearCorner = Instance.new("UICorner")
-ClearCorner.CornerRadius = UDim.new(0, 12)
+ClearCorner.CornerRadius = UDim.new(0, 8)
 ClearCorner.Parent = ClearButton
+
+-- Corner cho format buttons
+local PrettyCorner = Instance.new("UICorner")
+PrettyCorner.CornerRadius = UDim.new(0, 4)
+PrettyCorner.Parent = FormatPretty
+
+local MinifyCorner = Instance.new("UICorner")
+MinifyCorner.CornerRadius = UDim.new(0, 4)
+MinifyCorner.Parent = FormatMinify
+
+local DebugCorner = Instance.new("UICorner")
+DebugCorner.CornerRadius = UDim.new(0, 4)
+DebugCorner.Parent = FormatDebug
 --[[
-    STATUS BAR
+    STATUS BAR - KÍCH THƯỚC VỪA
 ]]
 
 local StatusBar = Instance.new("Frame")
-StatusBar.Size = UDim2.new(1, 0, 0, 50)
-StatusBar.Position = UDim2.new(0, 0, 1, -50)
+StatusBar.Size = UDim2.new(1, 0, 0, 35)
+StatusBar.Position = UDim2.new(0, 0, 1, -35)
 StatusBar.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
 StatusBar.BorderSizePixel = 0
 StatusBar.Parent = MainFrame
 
 local StatusCorner = Instance.new("UICorner")
-StatusCorner.CornerRadius = UDim.new(0, 24)
+StatusCorner.CornerRadius = UDim.new(0, 16)
 StatusCorner.Parent = StatusBar
 
 local StatusText = Instance.new("TextLabel")
 StatusText.Size = UDim2.new(0.4, -20, 1, 0)
-StatusText.Position = UDim2.new(0, 20, 0, 0)
+StatusText.Position = UDim2.new(0, 10, 0, 0)
 StatusText.BackgroundTransparency = 1
 StatusText.Font = Enum.Font.Gotham
-StatusText.Text = "✨ READY | 10M+ OBFUSCATORS"
+StatusText.Text = "✨ READY"
 StatusText.TextColor3 = Color3.fromRGB(150, 150, 160)
-StatusText.TextSize = 14
+StatusText.TextSize = 12
 StatusText.TextXAlignment = Enum.TextXAlignment.Left
 StatusText.Parent = StatusBar
 
 local ProgressFrame = Instance.new("Frame")
 ProgressFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-ProgressFrame.Position = UDim2.new(0.4, 20, 0.5, -10)
-ProgressFrame.Size = UDim2.new(0.3, -40, 0, 20)
+ProgressFrame.Position = UDim2.new(0.4, 10, 0.5, -7)
+ProgressFrame.Size = UDim2.new(0.2, 0, 0, 14)
 ProgressFrame.BorderSizePixel = 0
 ProgressFrame.Parent = StatusBar
 
@@ -1051,23 +1064,23 @@ ProgressFillCorner.CornerRadius = UDim.new(1, 0)
 ProgressFillCorner.Parent = ProgressFill
 
 local ProgressText = Instance.new("TextLabel")
-ProgressText.Size = UDim2.new(0, 50, 1, 0)
+ProgressText.Size = UDim2.new(0, 35, 1, 0)
 ProgressText.Position = UDim2.new(1, 5, 0, 0)
 ProgressText.BackgroundTransparency = 1
 ProgressText.Font = Enum.Font.GothamBold
 ProgressText.Text = "0%"
 ProgressText.TextColor3 = Color3.fromRGB(0, 255, 255)
-ProgressText.TextSize = 12
+ProgressText.TextSize = 10
 ProgressText.Parent = ProgressFrame
 
 local VersionInfo = Instance.new("TextLabel")
-VersionInfo.Size = UDim2.new(0.3, -20, 1, 0)
-VersionInfo.Position = UDim2.new(0.7, 0, 0, 0)
+VersionInfo.Size = UDim2.new(0.4, -20, 1, 0)
+VersionInfo.Position = UDim2.new(0.6, 0, 0, 0)
 VersionInfo.BackgroundTransparency = 1
 VersionInfo.Font = Enum.Font.Gotham
-VersionInfo.Text = "🔥 V14.0 | 10M+ OBF | AI 100%"
+VersionInfo.Text = "🔥 V14.0 | 10M+ OBF"
 VersionInfo.TextColor3 = Color3.fromRGB(100, 100, 150)
-VersionInfo.TextSize = 12
+VersionInfo.TextSize = 11
 VersionInfo.TextXAlignment = Enum.TextXAlignment.Right
 VersionInfo.Parent = StatusBar
 --[[
