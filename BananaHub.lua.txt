@@ -1,4 +1,18 @@
 getgenv().BypassExecutorCheck = true
+
+-- Thêm các dòng này:
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", function(...)
+    local method = getnamecallmethod()
+    local args = {...}
+
+    if method == "FireServer" and tostring(args[1]):find("Teleport") then
+        return
+    end
+
+    return oldNamecall(...)
+end)
+
 -- Deobf by Obofo Roblox
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,7 +26,6 @@ local VirtualUser = game:GetService("VirtualUser")
 local Lighting = game:GetService("Lighting")
 local CollectionService = game:GetService("CollectionService")
 local Stats = game:GetService("Stats")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 local CommF_Remote = Remotes:WaitForChild("CommF_")
 
