@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://luacrack.site/index.php/KhanggVTX/raw/AXVERHUB-Bypass-Auto-Chest-DEV-Axver-B.txt))()
