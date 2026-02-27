@@ -21,7 +21,7 @@ local ValidKeys = {
     "AXVER-FREE-O9PLM1A6",
     "AXVER-FREE-ML9T18N1",
 }
-
+)
 -- Hàm giải mã base64
 local function decodeBase64(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
@@ -421,15 +421,15 @@ local plr = game:GetService("Players").LocalPlayer
 local Notification = require(game:GetService("ReplicatedStorage").Notification)
 
 -- Thông báo chào mừng
-Notification.new("<Color=Blue>Chào mừng đến với Axver hub<Color=/>"):Display()
+Notification.new("<Color=Blue>Chào mừng đến với Axver hub!<Color=/>"):Display()
 task.wait(3)
-Notification.new("<Color=Red>Axver Đẹp Trai Nhất Việt Nam<Color=/>"):Display()
+Notification.new("<Color=Red>Welcome to Axver Hub!<Color=/>"):Display()
 task.wait(3)
-Notification.new("<Color=Green>Axver Đẹp Trai Nhất Việt Nam<Color=/>"):Display()
+Notification.new("<Color=Green>Mọi người chơi game vui vẻ nhé!<Color=/>"):Display()
 task.wait(3)
-Notification.new("<Color=Purple>Năm Mới Chúc Anh Em Việt Nam Vui Vẻ<Color=/>"):Display()
-task.wait(3)
-Notification.new("<Color=White>Axver Đẹp Trai Nhất Việt Nam<Color=/>"):Display()
+Notification.new("<Color=Purple>Have fun playing the game everyone!<Color=/>"):Display()
+task.wait(3
+Notification.new("<Color=White>Follow kênh TIKTOK của Axver Hub để lấy những script mới nhất nhé<Color=/>"):Display()
 task.wait(3)
 Notification.new("<Color=Black>Axver Hub<Color=/>"):Display()
 task.wait(3)
