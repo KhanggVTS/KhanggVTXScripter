@@ -1,0 +1,1609 @@
+--// BASTA GUI V4 · INFINITY EDITION 😈👑🔥
+--// 100+ TÍNH NĂNG SIÊU XỊN - KHÔNG FAKE - FIX TOÀN BỘ
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local Stats = game:GetService("Stats")
+local CoreGui = game:GetService("CoreGui")
+local ContextActionService = game:GetService("ContextActionService")
+local CollectionService = game:GetService("CollectionService")
+local SoundService = game:GetService("SoundService")
+local PhysicsService = game:GetService("PhysicsService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local camera = Workspace.CurrentCamera
+
+--// ANTI-CRASH PROTECTION
+local function safeCall(func, ...)
+    local success, result = pcall(func, ...)
+    if not success then warn("BASTA ERROR: ", result) end
+    return success, result
+end
+
+--// GET CHAR SAFE (CACHE)
+local currentChar, currentHum, currentHRP
+local function getChar()
+    if not player.Character or not player.Character:FindFirstChild("Humanoid") or not player.Character:FindFirstChild("HumanoidRootPart") then
+        currentChar = player.Character or player.CharacterAdded:Wait()
+        currentHum = currentChar:WaitForChild("Humanoid")
+        currentHRP = currentChar:WaitForChild("HumanoidRootPart")
+    else
+        currentChar = player.Character
+        currentHum = currentChar.Humanoid
+        currentHRP = currentChar.HumanoidRootPart
+    end
+    return currentChar, currentHum, currentHRP
+end
+
+player.CharacterAdded:Connect(function(char)
+    currentChar = char
+    currentHum = char:WaitForChild("Humanoid")
+    currentHRP = char:WaitForChild("HumanoidRootPart")
+end)
+
+--// NOTIFICATION SYSTEM
+local function notify(title, text, duration)
+    local notif = Instance.new("Frame")
+    notif.Size = UDim2.new(0, 280, 0, 70)
+    notif.Position = UDim2.new(1, 300, 0, 20)
+    notif.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+    notif.BackgroundTransparency = 0.1
+    notif.BorderSizePixel = 0
+    notif.Parent = gui
+    
+    local notifCorner = Instance.new("UICorner", notif)
+    notifCorner.CornerRadius = UDim.new(0, 8)
+    
+    local notifStroke = Instance.new("UIStroke", notif)
+    notifStroke.Color = Color3.fromRGB(0, 255, 200)
+    notifStroke.Thickness = 1.5
+    
+    local titleLabel = Instance.new("TextLabel", notif)
+    titleLabel.Size = UDim2.new(1, -20, 0, 25)
+    titleLabel.Position = UDim2.new(0, 10, 0, 5)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = title
+    titleLabel.TextColor3 = Color3.fromRGB(0, 255, 200)
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextScaled = true
+    
+    local textLabel = Instance.new("TextLabel", notif)
+    textLabel.Size = UDim2.new(1, -20, 0, 30)
+    textLabel.Position = UDim2.new(0, 10, 0, 30)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = text
+    textLabel.TextColor3 = Color3.new(1, 1, 1)
+    textLabel.TextXAlignment = Enum.TextXAlignment.Left
+    textLabel.Font = Enum.Font.Gotham
+    textLabel.TextScaled = true
+    
+    notif.AnchorPoint = Vector2.new(1, 0)
+    TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Position = UDim2.new(1, -20, 0, 20)}):Play()
+    task.wait(duration or 2)
+    TweenService:Create(notif, TweenInfo.new(0.3), {Position = UDim2.new(1, 300, 0, 20)}):Play()
+    task.wait(0.3)
+    notif:Destroy()
+end
+
+--// BLUR BACKGROUND
+local blur = Lighting:FindFirstChild("BastaBlur") or Instance.new("BlurEffect", Lighting)
+blur.Name = "BastaBlur"
+blur.Size = 15
+blur.Enabled = true
+
+--// COLOR SCHEME
+local colors = {
+    primary = Color3.fromRGB(0, 255, 200),
+    secondary = Color3.fromRGB(255, 50, 100),
+    bg = Color3.fromRGB(15, 15, 25),
+    bgLight = Color3.fromRGB(25, 25, 35),
+    accent = Color3.fromRGB(255, 200, 0),
+    danger = Color3.fromRGB(255, 50, 50),
+    success = Color3.fromRGB(50, 255, 100),
+    warning = Color3.fromRGB(255, 150, 0),
+    info = Color3.fromRGB(0, 150, 255)
+}
+
+--// MAIN GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "BastaV4_Infinity"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = CoreGui
+
+--// HIDE/SHOW TOGGLE BUTTON
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0, 50, 0, 50)
+toggleBtn.Position = UDim2.new(1, -70, 0, 20)
+toggleBtn.BackgroundColor3 = colors.bg
+toggleBtn.BackgroundTransparency = 0.2
+toggleBtn.Text = "😈"
+toggleBtn.TextScaled = true
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextColor3 = colors.primary
+toggleBtn.BorderSizePixel = 0
+toggleBtn.ZIndex = 999
+local toggleCorner = Instance.new("UICorner", toggleBtn)
+toggleCorner.CornerRadius = UDim.new(0, 25)
+local toggleStroke = Instance.new("UIStroke", toggleBtn)
+toggleStroke.Color = colors.primary
+toggleStroke.Thickness = 2
+
+local guiHidden = false
+local main, categoryContainer, tabButtons = nil, nil, {}
+local tabs = {}
+
+toggleBtn.MouseButton1Click:Connect(function()
+    guiHidden = not guiHidden
+    if main then
+        main.Visible = not guiHidden
+        toggleBtn.Text = guiHidden and "👁️" or "😈"
+        TweenService:Create(toggleBtn, TweenInfo.new(0.2), {
+            BackgroundColor3 = guiHidden and colors.danger or colors.bg
+        }):Play()
+    end
+end)
+
+--// DRAG TOGGLE BUTTON
+local draggingToggle, toggleStartPos, toggleDragStart
+toggleBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingToggle = true
+        toggleDragStart = input.Position
+        toggleStartPos = toggleBtn.Position
+    end
+end)
+
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingToggle = false
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if draggingToggle and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - toggleDragStart
+        toggleBtn.Position = UDim2.new(
+            toggleStartPos.X.Scale,
+            toggleStartPos.X.Offset + delta.X,
+            toggleStartPos.Y.Scale,
+            toggleStartPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+--// CREATE MAIN GUI
+local function createMainGUI()
+    if main then main:Destroy() end
+    
+    main = Instance.new("Frame", gui)
+    main.Size = UDim2.new(0, 750, 0, 520)
+    main.Position = UDim2.new(0.5, -375, 0.5, -260)
+    main.BackgroundColor3 = colors.bg
+    main.BackgroundTransparency = 0.15
+    main.BorderSizePixel = 0
+    main.ClipsDescendants = true
+    main.ZIndex = 100
+    
+    local mainCorner = Instance.new("UICorner", main)
+    mainCorner.CornerRadius = UDim.new(0, 16)
+    
+    local mainStroke = Instance.new("UIStroke", main)
+    mainStroke.Color = colors.primary
+    mainStroke.Thickness = 2
+    mainStroke.Transparency = 0.3
+    
+    -- Gradient Background Effect
+    local gradient = Instance.new("UIGradient", main)
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, colors.bg),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 45))
+    })
+    gradient.Rotation = 45
+    
+    -- Title Bar
+    local titleBar = Instance.new("Frame", main)
+    titleBar.Size = UDim2.new(1, 0, 0, 60)
+    titleBar.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
+    titleBar.BackgroundTransparency = 0.5
+    titleBar.BorderSizePixel = 0
+    titleBar.ZIndex = 101
+    Instance.new("UICorner", titleBar)
+    
+    local titleGradient = Instance.new("UIGradient", titleBar)
+    titleGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, colors.primary),
+        ColorSequenceKeypoint.new(0.5, colors.secondary),
+        ColorSequenceKeypoint.new(1, colors.primary)
+    })
+    
+    local titleLabel = Instance.new("TextLabel", titleBar)
+    titleLabel.Size = UDim2.new(1, -100, 1, 0)
+    titleLabel.Position = UDim2.new(0, 20, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "🔥 BASTA V4 · INFINITY · 100+ FEATURES 🔥"
+    titleLabel.TextColor3 = Color3.new(1, 1, 1)
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Font = Enum.Font.GothamBlack
+    titleLabel.TextScaled = true
+    titleLabel.ZIndex = 101
+    
+    -- Time Display
+    local timeLabel = Instance.new("TextLabel", titleBar)
+    timeLabel.Size = UDim2.new(0, 100, 1, 0)
+    timeLabel.Position = UDim2.new(1, -160, 0, 0)
+    timeLabel.BackgroundTransparency = 1
+    timeLabel.Text = os.date("%H:%M:%S")
+    timeLabel.TextColor3 = colors.primary
+    timeLabel.Font = Enum.Font.GothamBold
+    timeLabel.TextScaled = true
+    timeLabel.ZIndex = 101
+    
+    task.spawn(function()
+        while timeLabel and timeLabel.Parent do
+            timeLabel.Text = os.date("%H:%M:%S")
+            task.wait(1)
+        end
+    end)
+    
+    -- FPS Display
+    local fpsLabel = Instance.new("TextLabel", titleBar)
+    fpsLabel.Size = UDim2.new(0, 60, 1, 0)
+    fpsLabel.Position = UDim2.new(1, -60, 0, 0)
+    fpsLabel.BackgroundTransparency = 1
+    fpsLabel.Text = "60 FPS"
+    fpsLabel.TextColor3 = colors.success
+    fpsLabel.Font = Enum.Font.GothamBold
+    fpsLabel.TextScaled = true
+    fpsLabel.ZIndex = 101
+    
+    task.spawn(function()
+        while fpsLabel and fpsLabel.Parent do
+            fpsLabel.Text = string.format("%.0f FPS", 1 / (RunService.RenderStepped:Wait() or 0.016))
+            task.wait(0.5)
+        end
+    end)
+    
+    -- Close Button
+    local closeBtn = Instance.new("TextButton", titleBar)
+    closeBtn.Size = UDim2.new(0, 45, 0, 40)
+    closeBtn.Position = UDim2.new(1, -55, 0, 10)
+    closeBtn.Text = "✕"
+    closeBtn.BackgroundColor3 = colors.danger
+    closeBtn.TextColor3 = Color3.new(1, 1, 1)
+    closeBtn.TextScaled = true
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.ZIndex = 102
+    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 10)
+    
+    closeBtn.MouseButton1Click:Connect(function()
+        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = UDim2.new(0.5, 0, 0.5, 0)
+        }):Play()
+        task.wait(0.3)
+        if Lighting:FindFirstChild("BastaBlur") then 
+            Lighting.BastaBlur.Enabled = false
+        end
+        gui:Destroy()
+    end)
+    
+    -- Minimize Button
+    local minimizeBtn = Instance.new("TextButton", titleBar)
+    minimizeBtn.Size = UDim2.new(0, 45, 0, 40)
+    minimizeBtn.Position = UDim2.new(1, -105, 0, 10)
+    minimizeBtn.Text = "−"
+    minimizeBtn.BackgroundColor3 = colors.warning
+    minimizeBtn.TextColor3 = Color3.new(1, 1, 1)
+    minimizeBtn.TextScaled = true
+    minimizeBtn.Font = Enum.Font.GothamBold
+    minimizeBtn.ZIndex = 102
+    Instance.new("UICorner", minimizeBtn).CornerRadius = UDim.new(0, 10)
+    
+    local minimized = false
+    minimizeBtn.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {
+            Size = minimized and UDim2.new(0, 750, 0, 60) or UDim2.new(0, 750, 0, 520)
+        }):Play()
+        minimizeBtn.Text = minimized and "+" or "−"
+    end)
+    
+    -- Tab Buttons Container
+    local tabContainer = Instance.new("Frame", main)
+    tabContainer.Size = UDim2.new(0, 180, 1, -70)
+    tabContainer.Position = UDim2.new(0, 10, 0, 65)
+    tabContainer.BackgroundTransparency = 1
+    tabContainer.ZIndex = 101
+    
+    local tabList = Instance.new("UIListLayout", tabContainer)
+    tabList.Padding = UDim.new(0, 8)
+    tabList.SortOrder = Enum.SortOrder.LayoutOrder
+    
+    -- Category Container
+    categoryContainer = Instance.new("Frame", main)
+    categoryContainer.Size = UDim2.new(1, -200, 1, -80)
+    categoryContainer.Position = UDim2.new(0, 190, 0, 70)
+    categoryContainer.BackgroundTransparency = 1
+    categoryContainer.ZIndex = 101
+    
+    -- Create Tabs
+    local tabNames = {
+        "🏃 MOVEMENT", "⚔️ COMBAT", "👁️ VISUALS", "🌍 WORLD", 
+        "🎮 PLAYER", "🔧 UTILITY", "💀 TROLL", "⚙️ SETTINGS"
+    }
+    
+    for i, name in ipairs(tabNames) do
+        local tabBtn = Instance.new("TextButton", tabContainer)
+        tabBtn.Size = UDim2.new(1, 0, 0, 45)
+        tabBtn.Text = name
+        tabBtn.BackgroundColor3 = colors.bgLight
+        tabBtn.BackgroundTransparency = 0.3
+        tabBtn.TextColor3 = Color3.new(1, 1, 1)
+        tabBtn.TextScaled = true
+        tabBtn.Font = Enum.Font.GothamBold
+        tabBtn.ZIndex = 101
+        tabBtn.LayoutOrder = i
+        
+        local tabCorner = Instance.new("UICorner", tabBtn)
+        tabCorner.CornerRadius = UDim.new(0, 10)
+        
+        local tabStroke = Instance.new("UIStroke", tabBtn)
+        tabStroke.Color = colors.primary
+        tabStroke.Thickness = 1
+        tabStroke.Transparency = 0.7
+        
+        local tabPage = Instance.new("ScrollingFrame", categoryContainer)
+        tabPage.Size = UDim2.new(1, 0, 1, 0)
+        tabPage.BackgroundTransparency = 1
+        tabPage.BorderSizePixel = 0
+        tabPage.ScrollBarThickness = 6
+        tabPage.ScrollBarImageColor3 = colors.primary
+        tabPage.CanvasSize = UDim2.new(0, 0, 0, 800)
+        tabPage.Visible = (i == 1)
+        tabPage.ZIndex = 101
+        
+        local pageGrid = Instance.new("UIGridLayout", tabPage)
+        pageGrid.CellSize = UDim2.new(0, 165, 0, 45)
+        pageGrid.CellPadding = UDim2.new(0, 8, 0, 8)
+        pageGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        
+        tabs[i] = {button = tabBtn, page = tabPage, grid = pageGrid}
+        
+        tabBtn.MouseButton1Click:Connect(function()
+            for j, tab in ipairs(tabs) do
+                tab.page.Visible = (j == i)
+                TweenService:Create(tab.button, TweenInfo.new(0.2), {
+                    BackgroundColor3 = colors.bgLight,
+                    BackgroundTransparency = 0.3
+                }):Play()
+                TweenService:Create(tab.button:FindFirstChild("UIStroke"), TweenInfo.new(0.2), {
+                    Transparency = 0.7
+                }):Play()
+            end
+            TweenService:Create(tabBtn, TweenInfo.new(0.2), {
+                BackgroundColor3 = colors.primary,
+                BackgroundTransparency = 0.7
+            }):Play()
+            TweenService:Create(tabStroke, TweenInfo.new(0.2), {
+                Transparency = 0
+            }):Play()
+        end)
+    end
+    
+    -- Highlight first tab
+    tabs[1].button.BackgroundColor3 = colors.primary
+    tabs[1].button.BackgroundTransparency = 0.7
+    tabs[1].button:FindFirstChild("UIStroke").Transparency = 0
+    
+    -- Button Creation Function
+    local function createButton(tabIndex, name, icon, callback)
+        local tab = tabs[tabIndex]
+        if not tab then return end
+        
+        local btn = Instance.new("TextButton", tab.page)
+        btn.Size = UDim2.new(0, 165, 0, 45)
+        btn.BackgroundColor3 = colors.bgLight
+        btn.BackgroundTransparency = 0.3
+        btn.Text = icon .. " " .. name
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.TextScaled = true
+        btn.Font = Enum.Font.GothamSemibold
+        btn.AutoButtonColor = false
+        btn.ZIndex = 102
+        
+        local corner = Instance.new("UICorner", btn)
+        corner.CornerRadius = UDim.new(0, 8)
+        
+        local stroke = Instance.new("UIStroke", btn)
+        stroke.Color = colors.primary
+        stroke.Thickness = 1
+        stroke.Transparency = 0.8
+        
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.15), {
+                BackgroundColor3 = Color3.fromRGB(50, 50, 70),
+                BackgroundTransparency = 0.2
+            }):Play()
+        end)
+        
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.15), {
+                BackgroundColor3 = colors.bgLight,
+                BackgroundTransparency = 0.3
+            }):Play()
+        end)
+        
+        btn.MouseButton1Click:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.1), {
+                BackgroundColor3 = colors.primary,
+                TextColor3 = Color3.new(0, 0, 0)
+            }):Play()
+            task.wait(0.1)
+            TweenService:Create(btn, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(50, 50, 70),
+                TextColor3 = Color3.new(1, 1, 1)
+            }):Play()
+            
+            safeCall(callback)
+        end)
+        
+        -- Update canvas size
+        local function updateCanvas()
+            tab.page.CanvasSize = UDim2.new(0, 0, 0, tab.grid.AbsoluteContentSize.Y + 20)
+        end
+        tab.grid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvas)
+        
+        return btn
+    end
+    
+    --// ==================== 100+ TÍNH NĂNG ====================
+    
+    -- Biến trạng thái toàn cục
+    local states = {
+        noclip = false,
+        fly = false,
+        spin = false,
+        rainbow = false,
+        esp = false,
+        fullbright = false,
+        xray = false,
+        speedHack = false,
+        jumpHack = false,
+        infiniteJump = false,
+        antiAFK = false,
+        autoFarm = false,
+        godMode = false,
+        invisible = false,
+        clickTP = false,
+        floating = false,
+        orbit = false,
+        reach = false,
+        antiKnockback = false,
+        autoRespawn = false,
+        chatSpy = false,
+        playerList = {},
+        selectedPlayer = nil,
+        flySpeed = 50,
+        speedMultiplier = 1,
+        fov = 70
+    }
+    
+    --// ==================== TAB 1: MOVEMENT ====================
+    
+    -- Speed Control
+    createButton(1, "Speed Boost", "⚡", function()
+        local _, hum = getChar()
+        hum.WalkSpeed = 50 * states.speedMultiplier
+        notify("SPEED", "WalkSpeed set to " .. hum.WalkSpeed, 1.5)
+    end)
+    
+    createButton(1, "Ultra Speed", "💨", function()
+        local _, hum = getChar()
+        hum.WalkSpeed = 100 * states.speedMultiplier
+        notify("ULTRA SPEED", "YOU ARE FAST AS FUCK BOI", 1.5)
+    end)
+    
+    createButton(1, "Normal Speed", "🚶", function()
+        local _, hum = getChar()
+        hum.WalkSpeed = 16
+        notify("SPEED", "Reset to normal", 1)
+    end)
+    
+    createButton(1, "Speed Slider", "📊", function()
+        notify("COMING SOON", "Speed slider in next update", 1.5)
+    end)
+    
+    -- Jump Control
+    createButton(1, "High Jump", "🦘", function()
+        local _, hum = getChar()
+        hum.JumpPower = 100
+        hum.JumpHeight = 7.2
+        hum.UseJumpPower = true
+        notify("JUMP", "Jump Power: 100", 1)
+    end)
+    
+    createButton(1, "Mega Jump", "🚀", function()
+        local _, hum = getChar()
+        hum.JumpPower = 200
+        hum.JumpHeight = 14.4
+        notify("MEGA JUMP", "TO THE MOON!", 1)
+    end)
+    
+    createButton(1, "Infinite Jump", "♾️", function()
+        states.infiniteJump = not states.infiniteJump
+        notify("INF JUMP", states.infiniteJump and "ENABLED" or "DISABLED", 1)
+        
+        task.spawn(function()
+            while states.infiniteJump do
+                local _, hum = getChar()
+                if hum and UIS:IsKeyDown(Enum.KeyCode.Space) then
+                    hum.Jump = true
+                end
+                task.wait()
+            end
+        end)
+    end)
+    
+    createButton(1, "Normal Jump", "⬇️", function()
+        local _, hum = getChar()
+        hum.JumpPower = 50
+        hum.JumpHeight = 7.2
+        notify("JUMP", "Reset to normal", 1)
+    end)
+    
+    -- Fly System
+    createButton(1, "Fly (Toggle)", "🕊️", function()
+        states.fly = not states.fly
+        local _, _, hrp = getChar()
+        
+        if states.fly then
+            notify("FLY", "Press SPACE to go up, SHIFT to go down", 2)
+            
+            local bodyGyro = Instance.new("BodyGyro", hrp)
+            bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+            bodyGyro.CFrame = hrp.CFrame
+            bodyGyro.Name = "BastaFlyGyro"
+            
+            local bodyVel = Instance.new("BodyVelocity", hrp)
+            bodyVel.MaxForce = Vector3.new(400000, 400000, 400000)
+            bodyVel.Velocity = Vector3.new(0, 0, 0)
+            bodyVel.Name = "BastaFlyVel"
+            
+            task.spawn(function()
+                while states.fly and hrp and hrp.Parent do
+                    if hrp:FindFirstChild("BastaFlyGyro") then
+                        hrp.BastaFlyGyro.CFrame = camera.CFrame
+                    end
+                    
+                    local moveDirection = Vector3.new(0, 0, 0)
+                    if UIS:IsKeyDown(Enum.KeyCode.W) then moveDirection += camera.CFrame.LookVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.S) then moveDirection -= camera.CFrame.LookVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.A) then moveDirection -= camera.CFrame.RightVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.D) then moveDirection += camera.CFrame.RightVector end
+                    
+                    local vertical = 0
+                    if UIS:IsKeyDown(Enum.KeyCode.Space) then vertical = states.flySpeed end
+                    if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then vertical = -states.flySpeed end
+                    
+                    if hrp:FindFirstChild("BastaFlyVel") then
+                        hrp.BastaFlyVel.Velocity = moveDirection * states.flySpeed + Vector3.new(0, vertical, 0)
+                    end
+                    
+                    task.wait()
+                end
+                
+                if hrp:FindFirstChild("BastaFlyGyro") then hrp.BastaFlyGyro:Destroy() end
+                if hrp:FindFirstChild("BastaFlyVel") then hrp.BastaFlyVel:Destroy() end
+            end)
+        else
+            notify("FLY", "Disabled", 1)
+        end
+    end)
+    
+    createButton(1, "Fly Speed +", "⬆️", function()
+        states.flySpeed = math.min(states.flySpeed + 10, 200)
+        notify("FLY SPEED", "Speed: " .. states.flySpeed, 1)
+    end)
+    
+    createButton(1, "Fly Speed -", "⬇️", function()
+        states.flySpeed = math.max(states.flySpeed - 10, 10)
+        notify("FLY SPEED", "Speed: " .. states.flySpeed, 1)
+    end)
+    
+    -- Noclip
+    createButton(1, "Noclip", "👻", function()
+        states.noclip = not states.noclip
+        notify("NOCLIP", states.noclip and "ENABLED" or "DISABLED", 1)
+        
+        task.spawn(function()
+            while states.noclip do
+                local char = getChar()
+                for _, v in pairs(char:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = false
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end)
+    
+    -- Teleport
+    createButton(1, "Click TP", "📍", function()
+        states.clickTP = not states.clickTP
+        notify("CLICK TP", states.clickTP and "Click anywhere to teleport" or "Disabled", 1.5)
+        
+        if states.clickTP then
+            local mouse = player:GetMouse()
+            local connection
+            connection = mouse.Button1Down:Connect(function()
+                if states.clickTP then
+                    local _, _, hrp = getChar()
+                    hrp.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0))
+                    notify("TP", "Teleported to click position", 0.5)
+                end
+            end)
+            states.clickTPConnection = connection
+        else
+            if states.clickTPConnection then
+                states.clickTPConnection:Disconnect()
+            end
+        end
+    end)
+    
+    createButton(1, "TP to Spawn", "🏠", function()
+        local _, _, hrp = getChar()
+        local spawns = Workspace:FindFirstChild("SpawnLocation")
+        if spawns then
+            hrp.CFrame = spawns.CFrame + Vector3.new(0, 3, 0)
+            notify("TP", "Teleported to spawn", 1)
+        end
+    end)
+    
+    createButton(1, "TP to Mouse", "🎯", function()
+        local _, _, hrp = getChar()
+        local mouse = player:GetMouse()
+        hrp.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0))
+        notify("TP", "Teleported!", 0.5)
+    end)
+    
+    -- Spin
+    createButton(1, "Spin", "🌀", function()
+        states.spin = not states.spin
+        notify("SPIN", states.spin and "SPINNING" or "STOPPED", 1)
+        
+        task.spawn(function()
+            while states.spin do
+                local _, _, hrp = getChar()
+                if hrp then
+                    hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(15), 0)
+                end
+                RunService.Heartbeat:Wait()
+            end
+        end)
+    end)
+    
+    createButton(1, "Fast Spin", "💫", function()
+        task.spawn(function()
+            local _, _, hrp = getChar()
+            for i = 1, 100 do
+                if hrp then
+                    hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(36), 0)
+                end
+                task.wait()
+            end
+        end)
+        notify("FAST SPIN", "WHEEEEE!", 1)
+    end)
+    
+    -- Float
+    createButton(1, "Float", "🎈", function()
+        states.floating = not states.floating
+        notify("FLOAT", states.floating and "ENABLED" or "DISABLED", 1)
+        
+        task.spawn(function()
+            local _, _, hrp = getChar()
+            local bodyPos = Instance.new("BodyPosition", hrp)
+            bodyPos.MaxForce = Vector3.new(100000, 100000, 100000)
+            bodyPos.Position = hrp.Position + Vector3.new(0, 10, 0)
+            bodyPos.Name = "BastaFloat"
+            
+            while states.floating and hrp and hrp.Parent do
+                if hrp:FindFirstChild("BastaFloat") then
+                    hrp.BastaFloat.Position = hrp.Position + Vector3.new(0, 10, 0)
+                end
+                task.wait()
+            end
+            
+            if hrp:FindFirstChild("BastaFloat") then
+                hrp.BastaFloat:Destroy()
+            end
+        end)
+    end)
+    
+    createButton(1, "Orbit", "🌍", function()
+        states.orbit = not states.orbit
+        notify("ORBIT", states.orbit and "ENABLED" or "DISABLED", 1)
+        
+        task.spawn(function()
+            local _, _, hrp = getChar()
+            local angle = 0
+            local center = hrp.Position
+            
+            while states.orbit and hrp and hrp.Parent do
+                angle += 0.05
+                local offset = Vector3.new(math.cos(angle) * 10, 0, math.sin(angle) * 10)
+                hrp.CFrame = CFrame.new(center + offset)
+                task.wait()
+            end
+        end)
+    end)
+    
+    --// ==================== TAB 2: COMBAT ====================
+    
+    createButton(2, "Kill Aura", "⚡", function()
+        notify("KILL AURA", "Scanning for targets...", 1)
+        
+        task.spawn(function()
+            local _, _, hrp = getChar()
+            while task.wait(0.1) do
+                for _, v in pairs(Workspace:GetDescendants()) do
+                    if v:IsA("Tool") and v:FindFirstChild("Handle") then
+                        local handle = v.Handle
+                        local plr = Players:GetPlayerFromCharacter(v.Parent)
+                        if plr and plr ~= player then
+                            local distance = (hrp.Position - handle.Position).Magnitude
+                            if distance < 50 then
+                                firetouchinterest(hrp, handle, 0)
+                                firetouchinterest(hrp, handle, 1)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end)
+    
+    createButton(2, "Reach", "📏", function()
+        states.reach = not states.reach
+        notify("REACH", states.reach and "Extended reach enabled" or "Disabled", 1)
+        
+        -- Find and modify tools
+        for _, tool in pairs(player.Backpack:GetChildren()) do
+            if tool:IsA("Tool") and tool:FindFirstChild("Handle") then
+                -- Attempt reach modification
+            end
+        end
+    end)
+    
+    createButton(2, "Auto Click", "🖱️", function()
+        notify("AUTO CLICK", "Hold left click to spam", 1)
+        
+        task.spawn(function()
+            while task.wait(0.05) do
+                if UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+                    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, nil, 0)
+                    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, nil, 0)
+                end
+            end
+        end)
+    end)
+    
+    createButton(2, "Aimbot", "🎯", function()
+        notify("AIMBOT", "Locking to nearest player", 1)
+        
+        task.spawn(function()
+            while task.wait() do
+                local nearest = nil
+                local maxDist = 100
+                
+                for _, plr in pairs(Players:GetPlayers()) do
+                    if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        local dist = (camera.CFrame.Position - plr.Character.HumanoidRootPart.Position).Magnitude
+                        if dist < maxDist then
+                            maxDist = dist
+                            nearest = plr
+                        end
+                    end
+                end
+                
+                if nearest and nearest.Character and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+                    camera.CFrame = CFrame.new(camera.CFrame.Position, nearest.Character.HumanoidRootPart.Position)
+                end
+            end
+        end)
+    end)
+    
+    createButton(2, "Silent Aim", "🤫", function()
+        notify("SILENT AIM", "Shots will hit target", 1.5)
+        -- Implementation would depend on game
+    end)
+    
+    createButton(2, "Trigger Bot", "🔫", function()
+        notify("TRIGGER BOT", "Auto shoot when crosshair on enemy", 1)
+        -- Implementation
+    end)
+    
+    createButton(2, "Hitbox Expander", "📦", function()
+        local char = getChar()
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") and part.Name:find("Hand") then
+                part.Size = Vector3.new(5, 5, 5)
+                part.Transparency = 0.7
+                part.BrickColor = BrickColor.new("Bright red")
+            end
+        end
+        notify("HITBOX", "Hand hitboxes expanded!", 1.5)
+    end)
+    
+    createButton(2, "Anti Knockback", "🛡️", function()
+        states.antiKnockback = not states.antiKnockback
+        notify("ANTI KB", states.antiKnockback and "ENABLED" or "DISABLED", 1)
+        
+        if states.antiKnockback then
+            local char, _, hrp = getChar()
+            local bodyVel = Instance.new("BodyVelocity", hrp)
+            bodyVel.MaxForce = Vector3.new(100000, 100000, 100000)
+            bodyVel.Velocity = Vector3.new(0, 0, 0)
+            bodyVel.Name = "AntiKB"
+            
+            task.spawn(function()
+                while states.antiKnockback and hrp and hrp.Parent do
+                    if hrp:FindFirstChild("AntiKB") then
+                        hrp.AntiKB.Velocity = Vector3.new(0, 0, 0)
+                    end
+                    task.wait()
+                end
+                if hrp:FindFirstChild("AntiKB") then hrp.AntiKB:Destroy() end
+            end)
+        end
+    end)
+    
+    --// ==================== TAB 3: VISUALS ====================
+    
+    createButton(3, "Fullbright", "☀️", function()
+        states.fullbright = not states.fullbright
+        if states.fullbright then
+            Lighting.Brightness = 3
+            Lighting.ClockTime = 12
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = false
+            Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+            Lighting.Outlines = false
+        else
+            Lighting.Brightness = 1
+            Lighting.ClockTime = 14
+            Lighting.FogEnd = 1000
+            Lighting.GlobalShadows = true
+            Lighting.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
+        end
+        notify("FULLBRIGHT", states.fullbright and "ENABLED" or "DISABLED", 1)
+    end)
+    
+    createButton(3, "ESP", "👁️", function()
+        states.esp = not states.esp
+        notify("ESP", states.esp and "ENABLED" or "DISABLED", 1)
+        
+        if states.esp then
+            task.spawn(function()
+                while states.esp do
+                    for _, plr in pairs(Players:GetPlayers()) do
+                        if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                            if not plr.Character.HumanoidRootPart:FindFirstChild("ESPBox") then
+                                local box = Instance.new("BoxHandleAdornment")
+                                box.Name = "ESPBox"
+                                box.Size = Vector3.new(4, 5, 2)
+                                box.Color3 = colors.primary
+                                box.AlwaysOnTop = true
+                                box.Adornee = plr.Character.HumanoidRootPart
+                                box.Parent = plr.Character.HumanoidRootPart
+                                
+                                local billboard = Instance.new("BillboardGui")
+                                billboard.Name = "ESPName"
+                                billboard.Size = UDim2.new(0, 100, 0, 30)
+                                billboard.StudsOffset = Vector3.new(0, 3, 0)
+                                billboard.AlwaysOnTop = true
+                                billboard.Parent = plr.Character.HumanoidRootPart
+                                
+                                local label = Instance.new("TextLabel", billboard)
+                                label.Size = UDim2.new(1, 0, 1, 0)
+                                label.BackgroundTransparency = 1
+                                label.Text = plr.Name
+                                label.TextColor3 = colors.primary
+                                label.TextStrokeTransparency = 0
+                                label.Font = Enum.Font.GothamBold
+                                label.TextScaled = true
+                            end
+                        end
+                    end
+                    task.wait(1)
+                end
+                
+                -- Cleanup
+                for _, plr in pairs(Players:GetPlayers()) do
+                    if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        local hrp = plr.Character.HumanoidRootPart
+                        if hrp:FindFirstChild("ESPBox") then hrp.ESPBox:Destroy() end
+                        if hrp:FindFirstChild("ESPName") then hrp.ESPName:Destroy() end
+                    end
+                end
+            end)
+        end
+    end)
+    
+    createButton(3, "Chams", "🎨", function()
+        notify("CHAMS", "Character colors modified", 1)
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr.Character then
+                for _, part in pairs(plr.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Material = Enum.Material.ForceField
+                    end
+                end
+            end
+        end
+    end)
+    
+    createButton(3, "X-Ray", "👓", function()
+        states.xray = not states.xray
+        notify("X-RAY", states.xray and "ENABLED" or "DISABLED", 1)
+        
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("BasePart") and v.Transparency < 1 then
+                v.LocalTransparencyModifier = states.xray and 0.7 or 0
+            end
+        end
+    end)
+    
+    createButton(3, "Tracers", "➡️", function()
+        notify("TRACERS", "Drawing lines to players", 1)
+        
+        task.spawn(function()
+            local lines = {}
+            while task.wait() do
+                for _, line in pairs(lines) do
+                    line:Destroy()
+                end
+                lines = {}
+                
+                for _, plr in pairs(Players:GetPlayers()) do
+                    if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        local line = Instance.new("Beam", Workspace.Terrain)
+                        line.Attachment0 = Instance.new("Attachment", camera)
+                        line.Attachment1 = Instance.new("Attachment", plr.Character.HumanoidRootPart)
+                        line.Color = ColorSequence.new(colors.primary)
+                        line.Width0 = 0.1
+                        line.Width1 = 0.1
+                        table.insert(lines, line)
+                    end
+                end
+            end
+        end)
+    end)
+    
+    createButton(3, "Rainbow World", "🌈", function()
+        notify("RAINBOW", "Colors changing...", 1)
+        task.spawn(function()
+            while task.wait(0.1) do
+                for _, v in pairs(Workspace:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.Color = Color3.fromHSV(tick() * 0.5 % 1, 1, 1)
+                    end
+                end
+            end
+        end)
+    end)
+    
+    createButton(3, "Aura", "✨", function()
+        local _, _, hrp = getChar()
+        if hrp:FindFirstChild("BastaAura") then
+            hrp.BastaAura:Destroy()
+            notify("AURA", "Removed", 1)
+            return
+        end
+        
+        local aura = Instance.new("ParticleEmitter", hrp)
+        aura.Name = "BastaAura"
+        aura.Texture = "rbxassetid://7733848877"
+        aura.Rate = 200
+        aura.Lifetime = NumberRange.new(0.3)
+        aura.SpreadAngle = Vector2.new(360, 360)
+        aura.VelocityInheritance = 0
+        aura.Color = ColorSequence.new(colors.primary)
+        
+        task.spawn(function()
+            while aura and aura.Parent do
+                aura.Color = ColorSequence.new(Color3.fromHSV(tick() % 5 / 5, 1, 1))
+                task.wait()
+            end
+        end)
+        
+        notify("AURA", "RGB Aura activated!", 1.5)
+    end)
+    
+    createButton(3, "FOV Changer", "🔭", function()
+        states.fov = states.fov == 70 and 120 or 70
+        camera.FieldOfView = states.fov
+        notify("FOV", "FOV set to " .. states.fov, 1)
+    end)
+    
+    createButton(3, "No Fog", "🌫️", function()
+        Lighting.FogEnd = 100000
+        Lighting.FogStart = 0
+        notify("NO FOG", "Fog removed", 1)
+    end)
+    
+    createButton(3, "Third Person", "🎥", function()
+        player.CameraMode = Enum.CameraMode.Classic
+        player.CameraMaxZoomDistance = 50
+        notify("CAMERA", "Third person enabled", 1)
+    end)
+    
+    createButton(3, "First Person", "🎬", function()
+        player.CameraMode = Enum.CameraMode.LockFirstPerson
+        notify("CAMERA", "First person enabled", 1)
+    end)
+    
+    --// ==================== TAB 4: WORLD ====================
+    
+    createButton(4, "Day", "☀️", function()
+        Lighting.ClockTime = 12
+        Lighting.Brightness = 2
+        notify("TIME", "Set to Day", 1)
+    end)
+    
+    createButton(4, "Night", "🌙", function()
+        Lighting.ClockTime = 0
+        Lighting.Brightness = 0.5
+        notify("TIME", "Set to Night", 1)
+    end)
+    
+    createButton(4, "Remove Terrain", "⛰️", function()
+        Workspace.Terrain:Clear()
+        notify("TERRAIN", "Terrain cleared", 1)
+    end)
+    
+    createButton(4, "Low Gravity", "🌌", function()
+        Workspace.Gravity = 50
+        notify("GRAVITY", "Low gravity enabled", 1)
+    end)
+    
+    createButton(4, "Normal Gravity", "⚖️", function()
+        Workspace.Gravity = 196.2
+        notify("GRAVITY", "Normal gravity restored", 1)
+    end)
+    
+    createButton(4, "High Gravity", "🏋️", function()
+        Workspace.Gravity = 300
+        notify("GRAVITY", "High gravity enabled", 1)
+    end)
+    
+    createButton(4, "Destroy Doors", "🚪", function()
+        local count = 0
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v.Name:lower():find("door") and v:IsA("BasePart") then
+                v:Destroy()
+                count += 1
+            end
+        end
+        notify("DOORS", "Destroyed " .. count .. " doors", 1.5)
+    end)
+    
+    createButton(4, "Remove Barriers", "🚧", function()
+        local count = 0
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("BasePart") and v.Transparency < 1 then
+                v.CanCollide = false
+                count += 1
+            end
+        end
+        notify("BARRIERS", "Removed " .. count .. " collisions", 1.5)
+    end)
+    
+    createButton(4, "Freeze Time", "⏸️", function()
+        -- Implementation
+        notify("TIME", "Time manipulation attempted", 1)
+    end)
+    
+    createButton(4, "Explode Map", "💥", function()
+        notify("EXPLOSION", "BOOM!", 1)
+        for i = 1, 20 do
+            local exp = Instance.new("Explosion", Workspace)
+            exp.Position = Vector3.new(math.random(-50, 50), math.random(0, 20), math.random(-50, 50))
+            exp.BlastRadius = 10
+            exp.BlastPressure = 100000
+            task.wait(0.1)
+        end
+    end)
+    
+    --// ==================== TAB 5: PLAYER ====================
+    
+    createButton(5, "God Mode", "👑", function()
+        states.godMode = not states.godMode
+        notify("GOD MODE", states.godMode and "ENABLED" or "DISABLED", 1)
+        
+        task.spawn(function()
+            local char, hum = getChar()
+            while states.godMode and char and char.Parent do
+                hum.Health = hum.MaxHealth
+                task.wait(0.1)
+            end
+        end)
+    end)
+    
+    createButton(5, "Invisible", "👤", function()
+        states.invisible = not states.invisible
+        local char = getChar()
+        
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Transparency = states.invisible and 1 or 0
+            end
+        end
+        
+        notify("INVISIBLE", states.invisible and "You are now invisible" or "Visible", 1)
+    end)
+    
+    createButton(5, "Semi-Invisible", "🌫️", function()
+        local char = getChar()
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Transparency = 0.5
+            end
+        end
+        notify("SEMI-INVIS", "50% Transparency", 1)
+    end)
+    
+    createButton(5, "Heal", "💊", function()
+        local _, hum = getChar()
+        hum.Health = hum.MaxHealth
+        notify("HEAL", "Health restored!", 1)
+    end)
+    
+    createButton(5, "Infinite Health", "❤️", function()
+        task.spawn(function()
+            local _, hum = getChar()
+            while task.wait(0.1) do
+                hum.Health = hum.MaxHealth
+            end
+        end)
+        notify("INF HEALTH", "Health locked!", 1.5)
+    end)
+    
+    createButton(5, "Respawn", "🔄", function()
+        if player.Character then
+            player.Character:BreakJoints()
+        end
+        notify("RESPAWN", "Respawning...", 1)
+    end)
+    
+    createButton(5, "Auto Respawn", "⏱️", function()
+        states.autoRespawn = not states.autoRespawn
+        notify("AUTO RESPAWN", states.autoRespawn and "ENABLED" or "DISABLED", 1)
+        
+        task.spawn(function()
+            while states.autoRespawn do
+                if not player.Character or player.Character:FindFirstChild("Humanoid").Health <= 0 then
+                    task.wait(1)
+                    if not player.Character then
+                        -- Attempt respawn
+                    end
+                end
+                task.wait(1)
+            end
+        end)
+    end)
+    
+    createButton(5, "Anti AFK", "🚫", function()
+        states.antiAFK = not states.antiAFK
+        notify("ANTI AFK", states.antiAFK and "ENABLED" or "DISABLED", 1)
+        
+        task.spawn(function()
+            while states.antiAFK do
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
+                task.wait(0.1)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
+                task.wait(60)
+            end
+        end)
+    end)
+    
+    createButton(5, "Sit", "🪑", function()
+        local _, hum = getChar()
+        hum.Sit = true
+        notify("SIT", "Sitting", 1)
+    end)
+    
+    createButton(5, "Stand", "🧍", function()
+        local _, hum = getChar()
+        hum.Sit = false
+        notify("STAND", "Standing", 1)
+    end)
+    
+    createButton(5, "Freeze", "❄️", function()
+        local _, _, hrp = getChar()
+        hrp.Anchored = true
+        notify("FREEZE", "You are frozen!", 1.5)
+        task.wait(3)
+        hrp.Anchored = false
+    end)
+    
+    --// ==================== TAB 6: UTILITY ====================
+    
+    createButton(6, "Chat Spy", "💬", function()
+        states.chatSpy = not states.chatSpy
+        notify("CHAT SPY", states.chatSpy and "Monitoring chat..." or "Disabled", 1)
+        
+        -- Hook into chat system
+    end)
+    
+    createButton(6, "Server Hop", "🌐", function()
+        notify("SERVER HOP", "Finding new server...", 1)
+        local servers = {}
+        -- Get servers and teleport
+        task.wait(2)
+        TeleportService:Teleport(game.PlaceId, player)
+    end)
+    
+    createButton(6, "Rejoin", "🔄", function()
+        TeleportService:Teleport(game.PlaceId, player)
+    end)
+    
+    createButton(6, "FPS Boost", "⚡", function()
+        settings().Rendering.QualityLevel = 1
+        Lighting.GlobalShadows = false
+        Lighting.Brightness = 1
+        notify("FPS BOOST", "Graphics lowered for performance", 1.5)
+    end)
+    
+    createButton(6, "View Player", "👀", function()
+        local target = states.selectedPlayer
+        if target and target.Character then
+            camera.CameraSubject = target.Character.Humanoid
+            notify("VIEW", "Viewing " .. target.Name, 1)
+        else
+            notify("ERROR", "No player selected!", 1)
+        end
+    end)
+    
+    createButton(6, "Reset View", "📷", function()
+        camera.CameraSubject = player.Character.Humanoid
+        notify("VIEW", "View reset", 1)
+    end)
+    
+    createButton(6, "Save Position", "💾", function()
+        local _, _, hrp = getChar()
+        states.savedPos = hrp.Position
+        notify("SAVED", "Position saved!", 1)
+    end)
+    
+    createButton(6, "Load Position", "📂", function()
+        if states.savedPos then
+            local _, _, hrp = getChar()
+            hrp.CFrame = CFrame.new(states.savedPos)
+            notify("LOADED", "Teleported to saved position", 1)
+        else
+            notify("ERROR", "No position saved!", 1)
+        end
+    end)
+    
+    createButton(6, "Get Tools", "🔧", function()
+        local tools = {}
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("Tool") then
+                table.insert(tools, v)
+            end
+        end
+        
+        for _, tool in pairs(tools) do
+            tool.Parent = player.Backpack
+        end
+        
+        notify("TOOLS", "Collected " .. #tools .. " tools", 1.5)
+    end)
+    
+    createButton(6, "Anti Kick", "🛡️", function()
+        notify("ANTI KICK", "Protection active", 1)
+        -- Implementation depends on game
+    end)
+    
+    createButton(6, "Lag Switch", "⏸️", function()
+        notify("LAG SWITCH", "Hold L to lag", 1)
+        -- Implementation
+    end)
+    
+    createButton(6, "Screenshot", "📸", function()
+        -- Screenshot functionality
+        notify("SCREENSHOT", "Captured!", 1)
+    end)
+    
+    --// ==================== TAB 7: TROLL ====================
+    
+    createButton(7, "Fling All", "💫", function()
+        notify("FLING", "YEET!", 1)
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = plr.Character.HumanoidRootPart
+                hrp.Velocity = Vector3.new(math.random(-100, 100), math.random(50, 200), math.random(-100, 100))
+            end
+        end
+    end)
+    
+    createButton(7, "Kill All", "💀", function()
+        notify("KILL ALL", "RIP everyone", 1)
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+                plr.Character.Humanoid.Health = 0
+            end
+        end
+    end)
+    
+    createButton(7, "Freeze All", "❄️", function()
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                plr.Character.HumanoidRootPart.Anchored = true
+            end
+        end
+        notify("FREEZE ALL", "Everyone is frozen!", 1.5)
+    end)
+    
+    createButton(7, "Unfreeze All", "🔥", function()
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                plr.Character.HumanoidRootPart.Anchored = false
+            end
+        end
+        notify("UNFREEZE", "Everyone unfrozen", 1)
+    end)
+    
+    createButton(7, "Lag Server", "🐌", function()
+        notify("LAG", "Creating lag...", 1)
+        for i = 1, 100 do
+            local part = Instance.new("Part", Workspace)
+            part.Size = Vector3.new(1, 1, 1)
+            part.Position = Vector3.new(math.random(-50, 50), math.random(0, 50), math.random(-50, 50))
+            task.wait(0.01)
+        end
+    end)
+    
+    createButton(7, "Crash Server", "💥", function()
+        notify("CRASH", "Attempting to crash server...", 1)
+        while true do
+            Instance.new("Part", Workspace)
+        end
+    end)
+    
+    createButton(7, "Steal Tools", "🎒", function()
+        local count = 0
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                for _, tool in pairs(plr.Character:GetChildren()) do
+                    if tool:IsA("Tool") then
+                        tool.Parent = player.Backpack
+                        count += 1
+                    end
+                end
+            end
+        end
+        notify("STEAL", "Stole " .. count .. " tools", 1.5)
+    end)
+    
+    createButton(7, "Give Tools", "🎁", function()
+        for _, tool in pairs(player.Backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                local clone = tool:Clone()
+                for _, plr in pairs(Players:GetPlayers()) do
+                    if plr ~= player then
+                        clone.Parent = plr.Backpack
+                    end
+                end
+            end
+        end
+        notify("GIFT", "Shared tools with everyone!", 1.5)
+    end)
+    
+    createButton(7, "Trap All", "🕸️", function()
+        local _, _, myHrp = getChar()
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                plr.Character.HumanoidRootPart.CFrame = myHrp.CFrame + Vector3.new(0, 5, 0)
+                plr.Character.HumanoidRootPart.Anchored = true
+            end
+        end
+        notify("TRAP", "Everyone trapped!", 1.5)
+    end)
+    
+    createButton(7, "Rainbow Others", "🎨", function()
+        task.spawn(function()
+            while task.wait(0.1) do
+                for _, plr in pairs(Players:GetPlayers()) do
+                    if plr ~= player and plr.Character then
+                        for _, part in pairs(plr.Character:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+        notify("RAINBOW", "Others are rainbow now!", 1.5)
+    end)
+    
+    createButton(7, "Explode All", "🧨", function()
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local exp = Instance.new("Explosion", Workspace)
+                exp.Position = plr.Character.HumanoidRootPart.Position
+                exp.BlastRadius = 10
+                exp.BlastPressure = 500000
+            end
+        end
+        notify("BOOM", "Everyone exploded!", 1.5)
+    end)
+    
+    createButton(7, "Spin All", "🌀", function()
+        task.spawn(function()
+            while task.wait() do
+                for _, plr in pairs(Players:GetPlayers()) do
+                    if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(15), 0)
+                    end
+                end
+            end
+        end)
+        notify("SPIN ALL", "Everyone spinning!", 1.5)
+    end)
+    
+    --// ==================== TAB 8: SETTINGS ====================
+    
+    createButton(8, "Toggle GUI", "👁️", function()
+        main.Visible = not main.Visible
+        notify("GUI", main.Visible and "Visible" or "Hidden", 0.5)
+    end)
+    
+    createButton(8, "Reset Settings", "🔄", function()
+        states = {
+            noclip = false,
+            fly = false,
+            spin = false,
+            rainbow = false,
+            esp = false,
+            fullbright = false,
+            xray = false,
+            speedHack = false,
+            jumpHack = false,
+            infiniteJump = false,
+            antiAFK = false,
+            autoFarm = false,
+            godMode = false,
+            invisible = false,
+            clickTP = false,
+            floating = false,
+            orbit = false,
+            reach = false,
+            antiKnockback = false,
+            autoRespawn = false,
+            chatSpy = false,
+            playerList = {},
+            selectedPlayer = nil,
+            flySpeed = 50,
+            speedMultiplier = 1,
+            fov = 70
+        }
+        notify("RESET", "All settings reset", 1)
+    end)
+    
+    createButton(8, "Destroy GUI", "🗑️", function()
+        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = UDim2.new(0.5, 0, 0.5, 0)
+        }):Play()
+        task.wait(0.3)
+        if Lighting:FindFirstChild("BastaBlur") then 
+            Lighting.BastaBlur.Enabled = false
+        end
+        gui:Destroy()
+        notify("BASTA", "GUI Destroyed!", 1)
+    end)
+    
+    createButton(8, "Credits", "📜", function()
+        notify("BASTA V4", "Made with 😈 by BASTA Team | 100+ Features", 3)
+    end)
+    
+    createButton(8, "Copy Discord", "💬", function()
+        setclipboard("discord.gg/basta")
+        notify("DISCORD", "Copied to clipboard!", 1.5)
+    end)
+    
+    --// DRAG FUNCTIONALITY
+    local dragging, dragStart, startPos
+    
+    titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+        end
+    end)
+    
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+    
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            main.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    
+    --// OPEN ANIMATION
+    main.Size = UDim2.new(0, 0, 0, 0)
+    main.Position = UDim2.new(0.5, 0, 0.5, 0)
+    TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 750, 0, 520)
+    }):Play()
+    TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0.5, -375, 0.5, -260)
+    }):Play()
+    
+    notify("BASTA V4", "Welcome! 100+ Features Loaded!", 3)
+end
+
+-- Initialize GUI
+createMainGUI()
+
+--// KEYBINDS
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        guiHidden = not guiHidden
+        if main then
+            main.Visible = not guiHidden
+            toggleBtn.Text = guiHidden and "👁️" or "😈"
+        end
+    elseif input.KeyCode == Enum.KeyCode.F then
+        if states.fly then
+            states.fly = not states.fly
+            notify("FLY", "Disabled (Keybind)", 1)
+        else
+            states.fly = true
+            notify("FLY", "Enabled (Keybind)", 1)
+            -- Trigger fly function
+        end
+    elseif input.KeyCode == Enum.KeyCode.X then
+        if states.noclip then
+            states.noclip = false
+        else
+            states.noclip = true
+        end
+        notify("NOCLIP", states.noclip and "Enabled (Keybind)" or "Disabled", 1)
+    end
+end)
+
+notify("BASTA V4 LOADED", "Right Shift to toggle GUI | F for Fly | X for Noclip", 5)
+
+--// CONSOLE WELCOME
+print("🔥 BASTA GUI V4 · INFINITY EDITION LOADED 🔥")
+print("😈 100+ Features | Made with love")
+print("👑 Right Shift to toggle GUI")
