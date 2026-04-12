@@ -5,29 +5,23 @@ if pGui:FindFirstChild(uiName) then pGui[uiName]:Destroy() end
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Debris = game:GetService("Debris")
-local UserInputService = game:GetService("UserInputService")
 
 local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local flying = false
 local flyParticles = nil
-local speedLines = nil
 local defaultFOV = 70
 local flyingFOV = 100
 local zoomTween = nil
-local cameraConnection = nil
 local originalCameraSubject = nil
 local originalCameraType = nil
+local legSwingConnection = nil
 
 local ScreenGui = Instance.new("ScreenGui", pGui)
 ScreenGui.Name = uiName
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.IgnoreGuiInset = true
-
-local blurEffect = Instance.new("BlurEffect", game:GetService("Lighting"))
-blurEffect.Size = 0
-blurEffect.Enabled = false
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
@@ -55,27 +49,12 @@ mainStroke.Color = Color3.fromRGB(150, 0, 255)
 mainStroke.Thickness = 3
 mainStroke.Transparency = 0.2
 
-local mainGlow = Instance.new("ImageLabel", MainFrame)
-mainGlow.BackgroundTransparency = 1
-mainGlow.Size = UDim2.new(1.2, 0, 1.2, 0)
-mainGlow.Position = UDim2.new(-0.1, 0, -0.1, 0)
-mainGlow.Image = "rbxassetid://6818377251"
-mainGlow.ImageColor3 = Color3.fromRGB(150, 0, 255)
-mainGlow.ImageTransparency = 0.85
-mainGlow.ScaleType = Enum.ScaleType.Slice
-mainGlow.SliceCenter = Rect.new(98, 98, 98, 98)
-mainGlow.ZIndex = 0
-
 task.spawn(function()
     while MainFrame.Parent do
         for _, t in ipairs({0.2, 0.8}) do
             TweenService:Create(mainStroke, 
                 TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
                 {Transparency = t}
-            ):Play()
-            TweenService:Create(mainGlow, 
-                TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-                {ImageTransparency = t + 0.65}
             ):Play()
             task.wait(2)
         end
@@ -109,19 +88,16 @@ task.spawn(function()
         local hue = (tick() * 0.3) % 1
         Title.TextColor3 = Color3.fromHSV(hue, 0.9, 1)
         mainStroke.Color = Color3.fromHSV(hue, 0.9, 1)
-        mainGlow.ImageColor3 = Color3.fromHSV(hue, 0.9, 1)
         
-        TweenService:Create(Title, TweenInfo.new(0.6, Enum.EasingStyle.Sine), 
-            {TextSize = 23}):Play()
+        TweenService:Create(Title, TweenInfo.new(0.6, Enum.EasingStyle.Sine), {TextSize = 23}):Play()
         task.wait(0.3)
-        TweenService:Create(Title, TweenInfo.new(0.6, Enum.EasingStyle.Sine), 
-            {TextSize = 22}):Play()
+        TweenService:Create(Title, TweenInfo.new(0.6, Enum.EasingStyle.Sine), {TextSize = 22}):Play()
         task.wait(0.3)
     end
 end)
 
 local SpeedInput = Instance.new("TextBox", MainFrame)
-SpeedInput.PlaceholderText = "💨 Tốc độ bay..."
+SpeedInput.PlaceholderText = "💨 Tốc độ..."
 SpeedInput.Position = UDim2.new(0.1, 0, 0.32, 0)
 SpeedInput.Size = UDim2.new(0.8, 0, 0, 35)
 SpeedInput.Text = "200"
@@ -197,51 +173,39 @@ Credits.Font = Enum.Font.Gotham
 Credits.TextSize = 10
 Credits.ZIndex = 2
 
-local function smoothCameraZoom(targetFOV, targetBlur)
-    if zoomTween then
-        zoomTween:Cancel()
-    end
-    
+local function smoothCameraZoom(targetFOV)
+    if zoomTween then zoomTween:Cancel() end
     zoomTween = TweenService:Create(camera, 
-        TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {FieldOfView = targetFOV}
     )
     zoomTween:Play()
-    
-    TweenService:Create(blurEffect, 
-        TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-        {Size = targetBlur}
-    ):Play()
 end
 
 local function createFlyTrail(char)
-    if flyParticles then 
-        flyParticles:Destroy() 
-        flyParticles = nil
-    end
+    if flyParticles then flyParticles:Destroy() end
     
     local root = char:FindFirstChild("HumanoidRootPart")
     if not root then return end
     
     local attachment = Instance.new("Attachment", root)
-    attachment.Position = Vector3.new(0, -1, -1.5)
+    attachment.Position = Vector3.new(0, -1.5, -2)
     
     flyParticles = Instance.new("ParticleEmitter", attachment)
     flyParticles.Texture = "rbxassetid://77302218896291"
     flyParticles.Rate = 80
-    flyParticles.Lifetime = NumberRange.new(0.6, 1.2)
-    flyParticles.Speed = NumberRange.new(4, 8)
-    flyParticles.SpreadAngle = Vector2.new(15, 15)
-    flyParticles.VelocityInheritance = 0.4
+    flyParticles.Lifetime = NumberRange.new(0.5, 1)
+    flyParticles.Speed = NumberRange.new(3, 6)
+    flyParticles.SpreadAngle = Vector2.new(20, 20)
+    flyParticles.VelocityInheritance = 0.3
     flyParticles.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
-        ColorSequenceKeypoint.new(0.3, Color3.fromRGB(100, 0, 255)),
-        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(255, 0, 150)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 200, 0))
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 150))
     }
     flyParticles.Size = NumberSequence.new{
         NumberSequenceKeypoint.new(0, 0.4),
-        NumberSequenceKeypoint.new(0.5, 0.25),
+        NumberSequenceKeypoint.new(0.5, 0.2),
         NumberSequenceKeypoint.new(1, 0)
     }
     flyParticles.Transparency = NumberSequence.new{
@@ -251,49 +215,6 @@ local function createFlyTrail(char)
     flyParticles.LightEmission = 1
     flyParticles.LightInfluence = 0
     flyParticles.Enabled = false
-    flyParticles.Acceleration = Vector3.new(0, -2, 0)
-    flyParticles.Drag = 1.5
-end
-
-local function createSpeedLines()
-    if speedLines then
-        speedLines:Destroy()
-        speedLines = nil
-    end
-    
-    speedLines = Instance.new("ScreenGui", pGui)
-    speedLines.Name = "SpeedLines"
-    speedLines.IgnoreGuiInset = true
-    speedLines.ResetOnSpawn = false
-    speedLines.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    
-    local frame = Instance.new("Frame", speedLines)
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.ZIndex = 10
-    
-    for i = 1, 15 do
-        local line = Instance.new("Frame", frame)
-        line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        line.BackgroundTransparency = 0.7
-        line.BorderSizePixel = 0
-        line.Size = UDim2.new(0, math.random(50, 150), 0, math.random(1, 3))
-        line.Position = UDim2.new(math.random(), 0, math.random(), 0)
-        line.Rotation = math.random(-20, 20)
-        line.ZIndex = 10
-        
-        task.spawn(function()
-            while line and line.Parent and flying do
-                TweenService:Create(line, TweenInfo.new(0.3, Enum.EasingStyle.Linear), 
-                    {Position = UDim2.new(line.Position.X.Scale - 0.3, 0, line.Position.Y.Scale, 0)}
-                ):Play()
-                task.wait(0.3)
-                if line.Position.X.Scale < -0.2 then
-                    line.Position = UDim2.new(1.2, 0, math.random(), 0)
-                end
-            end
-        end)
-    end
 end
 
 local function createTakeoffEffect(char)
@@ -311,7 +232,7 @@ local function createTakeoffEffect(char)
     local ring = Instance.new("ParticleEmitter", effectPart)
     ring.Texture = "rbxassetid://77302218896291"
     ring.Rate = 200
-    ring.Lifetime = NumberRange.new(0.5, 0.8)
+    ring.Lifetime = NumberRange.new(0.4, 0.7)
     ring.Speed = NumberRange.new(15, 25)
     ring.SpreadAngle = Vector2.new(0, 0)
     ring.Color = ColorSequence.new{
@@ -325,30 +246,6 @@ local function createTakeoffEffect(char)
     }
     ring.LightEmission = 1
     ring:Emit(30)
-    
-    local upward = Instance.new("ParticleEmitter", effectPart)
-    upward.Texture = "rbxassetid://77302218896291"
-    upward.Rate = 150
-    upward.Lifetime = NumberRange.new(0.6, 1)
-    upward.Speed = NumberRange.new(10, 18)
-    upward.SpreadAngle = Vector2.new(360, 360)
-    upward.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 150))
-    }
-    upward.Size = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.5),
-        NumberSequenceKeypoint.new(1, 0)
-    }
-    upward.LightEmission = 1
-    upward:Emit(40)
-    
-    local flash = Instance.new("PointLight", effectPart)
-    flash.Color = Color3.fromRGB(0, 200, 255)
-    flash.Range = 15
-    flash.Brightness = 5
-    
-    TweenService:Create(flash, TweenInfo.new(0.5), {Brightness = 0}):Play()
     
     Debris:AddItem(effectPart, 1.5)
 end
@@ -368,7 +265,7 @@ local function createLandingEffect(char)
     local dust = Instance.new("ParticleEmitter", effectPart)
     dust.Texture = "rbxassetid://77302218896291"
     dust.Rate = 250
-    dust.Lifetime = NumberRange.new(0.4, 0.7)
+    dust.Lifetime = NumberRange.new(0.3, 0.6)
     dust.Speed = NumberRange.new(8, 15)
     dust.SpreadAngle = Vector2.new(360, 360)
     dust.Color = ColorSequence.new{
@@ -381,63 +278,36 @@ local function createLandingEffect(char)
     }
     dust:Emit(50)
     
-    local ring = Instance.new("ParticleEmitter", effectPart)
-    ring.Texture = "rbxassetid://77302218896291"
-    ring.Rate = 100
-    ring.Lifetime = NumberRange.new(0.3, 0.5)
-    ring.Speed = NumberRange.new(10, 15)
-    ring.SpreadAngle = Vector2.new(0, 0)
-    ring.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
-    }
-    ring.Size = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.5),
-        NumberSequenceKeypoint.new(1, 0)
-    }
-    ring:Emit(20)
-    
     Debris:AddItem(effectPart, 1)
 end
 
-local function setFlyPose(char, speed)
+local function resetAllJoints(char)
     local hum = char:FindFirstChildOfClass("Humanoid")
     if not hum then return end
     
     if hum.RigType == Enum.HumanoidRigType.R15 then
-        local rS = char:FindFirstChild("RightUpperArm") and char.RightUpperArm:FindFirstChild("RightShoulder")
-        local lS = char:FindFirstChild("LeftUpperArm") and char.LeftUpperArm:FindFirstChild("LeftShoulder")
-        local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
-        local rH = char:FindFirstChild("RightUpperLeg") and char.RightUpperLeg:FindFirstChild("RightHip")
-        local lH = char:FindFirstChild("LeftUpperLeg") and char.LeftUpperLeg:FindFirstChild("LeftHip")
-        local rL = char:FindFirstChild("RightLowerLeg") and char.RightLowerLeg:FindFirstChild("RightKnee")
-        local lL = char:FindFirstChild("LeftLowerLeg") and char.LeftLowerLeg:FindFirstChild("LeftKnee")
-        local torso = char:FindFirstChild("UpperTorso") and char.UpperTorso:FindFirstChild("Waist")
+        local joints = {
+            char:FindFirstChild("RightUpperArm") and char.RightUpperArm:FindFirstChild("RightShoulder"),
+            char:FindFirstChild("LeftUpperArm") and char.LeftUpperArm:FindFirstChild("LeftShoulder"),
+            char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck"),
+            char:FindFirstChild("RightUpperLeg") and char.RightUpperLeg:FindFirstChild("RightHip"),
+            char:FindFirstChild("LeftUpperLeg") and char.LeftUpperLeg:FindFirstChild("LeftHip"),
+            char:FindFirstChild("RightLowerLeg") and char.RightLowerLeg:FindFirstChild("RightKnee"),
+            char:FindFirstChild("LeftLowerLeg") and char.LeftLowerLeg:FindFirstChild("LeftKnee"),
+            char:FindFirstChild("UpperTorso") and char.UpperTorso:FindFirstChild("Waist")
+        }
         
-        if rS and lS and neck then
-            local armAngle = math.rad(-160 + math.sin(tick() * 8) * 5)
-            local legSwing = math.sin(tick() * 6) * 15
-            
-            if speed > 10 then
-                rS.C1 = CFrame.new(0.2, 0.7, -0.2) * CFrame.Angles(armAngle, math.rad(10), math.rad(-25))
-                lS.C1 = CFrame.new(-0.2, 0.7, -0.2) * CFrame.Angles(armAngle, math.rad(-10), math.rad(25))
-                neck.C1 = CFrame.new(0, -0.3, 0.1) * CFrame.Angles(math.rad(-35), 0, 0)
-                
-                if rH and lH then
-                    rH.C1 = CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15 + legSwing), 0, math.rad(-5))
-                    lH.C1 = CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15 - legSwing), 0, math.rad(5))
+        for _, joint in ipairs(joints) do
+            if joint then
+                if joint.Name == "RightShoulder" then
+                    joint.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(-25))
+                elseif joint.Name == "LeftShoulder" then
+                    joint.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(25))
+                elseif joint.Name == "Neck" then
+                    joint.C1 = CFrame.new(0, -0.5, 0)
+                else
+                    joint.C1 = CFrame.new(0, 0, 0)
                 end
-                
-                if rL then rL.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10), 0, 0) end
-                if lL then lL.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10), 0, 0) end
-                if torso then torso.C1 = CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-25), 0, 0) end
-            else
-                rS.C1 = rS.C1:Lerp(CFrame.new(0, 0.6, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(-15)), 0.1)
-                lS.C1 = lS.C1:Lerp(CFrame.new(0, 0.6, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(15)), 0.1)
-                neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.2, 0) * CFrame.Angles(math.rad(-15), 0, 0), 0.1)
-                
-                if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-5), 0, 0), 0.1) end
-                if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-5), 0, 0), 0.1) end
             end
         end
     else
@@ -447,60 +317,11 @@ local function setFlyPose(char, speed)
         local rH = char:FindFirstChild("Right Hip")
         local lH = char:FindFirstChild("Left Hip")
         
-        if rS and lS and neck then
-            local armAngle = math.rad(-150 + math.sin(tick() * 8) * 5)
-            local legSwing = math.sin(tick() * 6) * 10
-            
-            if speed > 10 then
-                rS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(armAngle, 0, math.rad(-20))
-                lS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(armAngle, 0, math.rad(20))
-                neck.C1 = CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-35), 0, 0)
-                
-                if rH then rH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10 + legSwing), 0, 0) end
-                if lH then lH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10 - legSwing), 0, 0) end
-            else
-                rS.C1 = rS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(-15)), 0.1)
-                lS.C1 = lS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(15)), 0.1)
-                neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.2, 0) * CFrame.Angles(math.rad(-15), 0, 0), 0.1)
-            end
-        end
-    end
-end
-
-local function resetPose(char)
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-    
-    if hum.RigType == Enum.HumanoidRigType.R15 then
-        local rS = char:FindFirstChild("RightUpperArm") and char.RightUpperArm:FindFirstChild("RightShoulder")
-        local lS = char:FindFirstChild("LeftUpperArm") and char.LeftUpperArm:FindFirstChild("LeftShoulder")
-        local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
-        local rH = char:FindFirstChild("RightUpperLeg") and char.RightUpperLeg:FindFirstChild("RightHip")
-        local lH = char:FindFirstChild("LeftUpperLeg") and char.LeftUpperLeg:FindFirstChild("LeftHip")
-        local rL = char:FindFirstChild("RightLowerLeg") and char.RightLowerLeg:FindFirstChild("RightKnee")
-        local lL = char:FindFirstChild("LeftLowerLeg") and char.LeftLowerLeg:FindFirstChild("LeftKnee")
-        local torso = char:FindFirstChild("UpperTorso") and char.UpperTorso:FindFirstChild("Waist")
-        
-        if rS then rS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(-25)) end
-        if lS then lS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(25)) end
-        if neck then neck.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if rH then rH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if lH then lH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if rL then rL.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if lL then lL.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if torso then torso.C1 = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0) end
-    else
-        local rS = char:FindFirstChild("Right Shoulder")
-        local lS = char:FindFirstChild("Left Shoulder")
-        local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
-        local rH = char:FindFirstChild("Right Hip")
-        local lH = char:FindFirstChild("Left Hip")
-        
-        if rS then rS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if lS then lS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if neck then neck.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if rH then rH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
-        if lH then lH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
+        if rS then rS.C1 = CFrame.new(0, 0.5, 0) end
+        if lS then lS.C1 = CFrame.new(0, 0.5, 0) end
+        if neck then neck.C1 = CFrame.new(0, -0.5, 0) end
+        if rH then rH.C1 = CFrame.new(0, -0.5, 0) end
+        if lH then lH.C1 = CFrame.new(0, -0.5, 0) end
     end
 end
 
@@ -521,7 +342,6 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
         
         createTakeoffEffect(char)
         createFlyTrail(char)
-        createSpeedLines()
         if flyParticles then flyParticles.Enabled = true end
         
         originalCameraSubject = camera.CameraSubject
@@ -529,8 +349,7 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
         camera.CameraSubject = root
         camera.CameraType = Enum.CameraType.Custom
         
-        smoothCameraZoom(flyingFOV, 15)
-        blurEffect.Enabled = true
+        smoothCameraZoom(flyingFOV)
         
         local bg = Instance.new("BodyGyro", root)
         bg.P = 90000
@@ -543,63 +362,107 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
         
         hum.PlatformStand = true
         
-        local lastVelocity = Vector3.zero
+        local legTime = 0
+        
+        legSwingConnection = RunService.RenderStepped:Connect(function(deltaTime)
+            if not flying or not char or not char.Parent then return end
+            
+            legTime = legTime + deltaTime * 8
+            
+            local speed = tonumber(SpeedInput.Text) or 200
+            
+            if hum.MoveDirection.Magnitude > 0 then
+                local flyDir = (hum.MoveDirection + Vector3.new(0, camera.CFrame.LookVector.Y * 1.5, 0)).Unit
+                bv.Velocity = bv.Velocity:Lerp(flyDir * speed, 0.1)
+                
+                if bv.Velocity.Magnitude > 1 then
+                    local lookDir = bv.Velocity.Unit
+                    bg.CFrame = CFrame.new(root.Position, root.Position + lookDir) * CFrame.Angles(math.rad(-60), 0, 0)
+                end
+                
+                if flyParticles then
+                    flyParticles.Rate = 100
+                    flyParticles.Speed = NumberRange.new(5, 10)
+                end
+            else
+                bv.Velocity = bv.Velocity:Lerp(Vector3.zero, 0.08)
+                
+                local lookDir = camera.CFrame.LookVector * Vector3.new(1, 0, 1)
+                if lookDir.Magnitude > 0 then
+                    bg.CFrame = bg.CFrame:Lerp(CFrame.new(root.Position, root.Position + lookDir), 0.08)
+                end
+                
+                if flyParticles then
+                    flyParticles.Rate = 40
+                    flyParticles.Speed = NumberRange.new(2, 4)
+                end
+            end
+            
+            if hum.RigType == Enum.HumanoidRigType.R15 then
+                local rH = char:FindFirstChild("RightUpperLeg") and char.RightUpperLeg:FindFirstChild("RightHip")
+                local lH = char:FindFirstChild("LeftUpperLeg") and char.LeftUpperLeg:FindFirstChild("LeftHip")
+                local rL = char:FindFirstChild("RightLowerLeg") and char.RightLowerLeg:FindFirstChild("RightKnee")
+                local lL = char:FindFirstChild("LeftLowerLeg") and char.LeftLowerLeg:FindFirstChild("LeftKnee")
+                local rS = char:FindFirstChild("RightUpperArm") and char.RightUpperArm:FindFirstChild("RightShoulder")
+                local lS = char:FindFirstChild("LeftUpperArm") and char.LeftUpperArm:FindFirstChild("LeftShoulder")
+                local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
+                local torso = char:FindFirstChild("UpperTorso") and char.UpperTorso:FindFirstChild("Waist")
+                
+                if bv.Velocity.Magnitude > 10 then
+                    local legSwing = math.sin(legTime) * 25
+                    local armSwing = math.sin(legTime) * 10
+                    
+                    if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15 + legSwing), 0, math.rad(-5)), 0.15) end
+                    if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15 - legSwing), 0, math.rad(5)), 0.15) end
+                    if rL then rL.C1 = rL.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(math.abs(legSwing) * 0.3), 0, 0), 0.15) end
+                    if lL then lL.C1 = lL.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(math.abs(legSwing) * 0.3), 0, 0), 0.15) end
+                    
+                    if rS then rS.C1 = rS.C1:Lerp(CFrame.new(0.2, 0.6, -0.2) * CFrame.Angles(math.rad(-150 + armSwing), math.rad(10), math.rad(-25)), 0.1) end
+                    if lS then lS.C1 = lS.C1:Lerp(CFrame.new(-0.2, 0.6, -0.2) * CFrame.Angles(math.rad(-150 - armSwing), math.rad(-10), math.rad(25)), 0.1) end
+                    if neck then neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.3, 0.1) * CFrame.Angles(math.rad(-30), 0, 0), 0.1) end
+                    if torso then torso.C1 = torso.C1:Lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-20), 0, 0), 0.1) end
+                else
+                    if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-5), 0, 0), 0.1) end
+                    if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-5), 0, 0), 0.1) end
+                    if rS then rS.C1 = rS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(-15)), 0.1) end
+                    if lS then lS.C1 = lS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(15)), 0.1) end
+                    if neck then neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.2, 0) * CFrame.Angles(math.rad(-15), 0, 0), 0.1) end
+                end
+            else
+                local rH = char:FindFirstChild("Right Hip")
+                local lH = char:FindFirstChild("Left Hip")
+                local rS = char:FindFirstChild("Right Shoulder")
+                local lS = char:FindFirstChild("Left Shoulder")
+                local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
+                
+                if bv.Velocity.Magnitude > 10 then
+                    local legSwing = math.sin(legTime) * 20
+                    
+                    if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10 + legSwing), 0, 0), 0.15) end
+                    if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10 - legSwing), 0, 0), 0.15) end
+                    if rS then rS.C1 = rS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-150), 0, math.rad(-20)), 0.1) end
+                    if lS then lS.C1 = lS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-150), 0, math.rad(20)), 0.1) end
+                    if neck then neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-30), 0, 0), 0.1) end
+                end
+            end
+        end)
         
         task.spawn(function()
             while flying and char and char.Parent do
                 RunService.RenderStepped:Wait()
-                local speed = tonumber(SpeedInput.Text) or 200
-                
-                if hum.MoveDirection.Magnitude > 0 then
-                    local flyDir = (hum.MoveDirection + Vector3.new(0, camera.CFrame.LookVector.Y * 1.5, 0)).Unit
-                    local targetVel = flyDir * speed
-                    bv.Velocity = bv.Velocity:Lerp(targetVel, 0.1)
-                    
-                    if bv.Velocity.Magnitude > 1 then
-                        local lookDir = bv.Velocity.Unit
-                        bg.CFrame = CFrame.new(root.Position, root.Position + lookDir) * CFrame.Angles(math.rad(-70), 0, 0)
-                    end
-                    
-                    setFlyPose(char, bv.Velocity.Magnitude)
-                    
-                    if flyParticles then
-                        flyParticles.Rate = 100
-                        flyParticles.Speed = NumberRange.new(5, 10)
-                    end
-                else
-                    bv.Velocity = bv.Velocity:Lerp(Vector3.zero, 0.08)
-                    
-                    local lookDir = camera.CFrame.LookVector * Vector3.new(1, 0, 1)
-                    if lookDir.Magnitude > 0 then
-                        bg.CFrame = bg.CFrame:Lerp(CFrame.new(root.Position, root.Position + lookDir), 0.08)
-                    end
-                    
-                    setFlyPose(char, 0)
-                    
-                    if flyParticles then
-                        flyParticles.Rate = 40
-                        flyParticles.Speed = NumberRange.new(2, 4)
-                    end
-                end
-                
-                lastVelocity = bv.Velocity
             end
             
             if bg then bg:Destroy() end
             if bv then bv:Destroy() end
+            if legSwingConnection then legSwingConnection:Disconnect() end
             hum.PlatformStand = false
             
-            resetPose(char)
+            resetAllJoints(char)
             
             if flyParticles then 
                 flyParticles.Enabled = false
                 flyParticles:Destroy()
                 flyParticles = nil
-            end
-            
-            if speedLines then
-                speedLines:Destroy()
-                speedLines = nil
             end
         end)
     else
@@ -611,23 +474,18 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
         
         createLandingEffect(char)
         
-        if originalCameraSubject then
-            camera.CameraSubject = originalCameraSubject
-        end
-        if originalCameraType then
-            camera.CameraType = originalCameraType
+        if legSwingConnection then 
+            legSwingConnection:Disconnect()
+            legSwingConnection = nil
         end
         
-        smoothCameraZoom(defaultFOV, 0)
-        blurEffect.Enabled = false
+        if originalCameraSubject then camera.CameraSubject = originalCameraSubject end
+        if originalCameraType then camera.CameraType = originalCameraType end
+        
+        smoothCameraZoom(defaultFOV)
         
         if flyParticles then 
             flyParticles.Enabled = false
-        end
-        
-        if speedLines then
-            speedLines:Destroy()
-            speedLines = nil
         end
     end
 end)
@@ -641,24 +499,15 @@ player.CharacterAdded:Connect(function(char)
             ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 120, 255))
         }
         
-        if originalCameraSubject then
-            camera.CameraSubject = originalCameraSubject
-        end
-        if originalCameraType then
-            camera.CameraType = originalCameraType
-        end
+        if legSwingConnection then legSwingConnection:Disconnect() end
+        if originalCameraSubject then camera.CameraSubject = originalCameraSubject end
+        if originalCameraType then camera.CameraType = originalCameraType end
         
-        smoothCameraZoom(defaultFOV, 0)
-        blurEffect.Enabled = false
+        smoothCameraZoom(defaultFOV)
         
         if flyParticles then 
             flyParticles:Destroy()
             flyParticles = nil
-        end
-        
-        if speedLines then
-            speedLines:Destroy()
-            speedLines = nil
         end
     end
 end)
