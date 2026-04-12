@@ -10,8 +10,9 @@ local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local flying = false
 local flyParticles = nil
+local bodyAura = nil
 local defaultFOV = 70
-local flyingFOV = 100
+local flyingFOV = 110
 local zoomTween = nil
 local originalCameraSubject = nil
 local originalCameraType = nil
@@ -176,10 +177,71 @@ Credits.ZIndex = 2
 local function smoothCameraZoom(targetFOV)
     if zoomTween then zoomTween:Cancel() end
     zoomTween = TweenService:Create(camera, 
-        TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {FieldOfView = targetFOV}
     )
     zoomTween:Play()
+end
+
+local function createBodyAura(char)
+    if bodyAura then bodyAura:Destroy() end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    bodyAura = Instance.new("Part")
+    bodyAura.Size = Vector3.new(4, 5, 2)
+    bodyAura.Transparency = 0.7
+    bodyAura.CanCollide = false
+    bodyAura.Anchored = false
+    bodyAura.Material = Enum.Material.Neon
+    bodyAura.Color = Color3.fromRGB(0, 200, 255)
+    bodyAura.Parent = char
+    
+    local weld = Instance.new("WeldConstraint", bodyAura)
+    weld.Part0 = bodyAura
+    weld.Part1 = root
+    
+    local auraLight = Instance.new("PointLight", bodyAura)
+    auraLight.Color = Color3.fromRGB(0, 200, 255)
+    auraLight.Range = 10
+    auraLight.Brightness = 2
+    
+    local auraParticles = Instance.new("ParticleEmitter", bodyAura)
+    auraParticles.Texture = "rbxassetid://77302218896291"
+    auraParticles.Rate = 30
+    auraParticles.Lifetime = NumberRange.new(0.5, 1)
+    auraParticles.Speed = NumberRange.new(1, 2)
+    auraParticles.SpreadAngle = Vector2.new(360, 360)
+    auraParticles.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 150))
+    }
+    auraParticles.Size = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.3),
+        NumberSequenceKeypoint.new(1, 0)
+    }
+    auraParticles.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.5),
+        NumberSequenceKeypoint.new(1, 1)
+    }
+    auraParticles.LightEmission = 1
+    
+    task.spawn(function()
+        while bodyAura and bodyAura.Parent and flying do
+            local hue = (tick() * 0.5) % 1
+            local color = Color3.fromHSV(hue, 0.9, 1)
+            bodyAura.Color = color
+            auraLight.Color = color
+            auraParticles.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, color),
+                ColorSequenceKeypoint.new(0.5, Color3.fromHSV((hue + 0.3) % 1, 0.9, 1)),
+                ColorSequenceKeypoint.new(1, Color3.fromHSV((hue + 0.6) % 1, 0.9, 1))
+            }
+            task.wait(0.1)
+        end
+    end)
 end
 
 local function createFlyTrail(char)
@@ -189,23 +251,24 @@ local function createFlyTrail(char)
     if not root then return end
     
     local attachment = Instance.new("Attachment", root)
-    attachment.Position = Vector3.new(0, -1.5, -2)
+    attachment.Position = Vector3.new(0, -1, -2)
     
     flyParticles = Instance.new("ParticleEmitter", attachment)
     flyParticles.Texture = "rbxassetid://77302218896291"
-    flyParticles.Rate = 80
-    flyParticles.Lifetime = NumberRange.new(0.5, 1)
-    flyParticles.Speed = NumberRange.new(3, 6)
-    flyParticles.SpreadAngle = Vector2.new(20, 20)
-    flyParticles.VelocityInheritance = 0.3
+    flyParticles.Rate = 100
+    flyParticles.Lifetime = NumberRange.new(0.6, 1.2)
+    flyParticles.Speed = NumberRange.new(4, 8)
+    flyParticles.SpreadAngle = Vector2.new(25, 25)
+    flyParticles.VelocityInheritance = 0.4
     flyParticles.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 150))
+        ColorSequenceKeypoint.new(0.3, Color3.fromRGB(150, 0, 255)),
+        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(255, 0, 150)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 200, 0))
     }
     flyParticles.Size = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.4),
-        NumberSequenceKeypoint.new(0.5, 0.2),
+        NumberSequenceKeypoint.new(0, 0.5),
+        NumberSequenceKeypoint.new(0.5, 0.3),
         NumberSequenceKeypoint.new(1, 0)
     }
     flyParticles.Transparency = NumberSequence.new{
@@ -215,6 +278,7 @@ local function createFlyTrail(char)
     flyParticles.LightEmission = 1
     flyParticles.LightInfluence = 0
     flyParticles.Enabled = false
+    flyParticles.Acceleration = Vector3.new(0, -2, 0)
 end
 
 local function createTakeoffEffect(char)
@@ -229,23 +293,31 @@ local function createTakeoffEffect(char)
     effectPart.Transparency = 1
     effectPart.Parent = workspace
     
-    local ring = Instance.new("ParticleEmitter", effectPart)
-    ring.Texture = "rbxassetid://77302218896291"
-    ring.Rate = 200
-    ring.Lifetime = NumberRange.new(0.4, 0.7)
-    ring.Speed = NumberRange.new(15, 25)
-    ring.SpreadAngle = Vector2.new(0, 0)
-    ring.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
-    }
-    ring.Size = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.8),
-        NumberSequenceKeypoint.new(1, 0)
-    }
-    ring.LightEmission = 1
-    ring:Emit(30)
+    for i = 1, 3 do
+        local ring = Instance.new("ParticleEmitter", effectPart)
+        ring.Texture = "rbxassetid://77302218896291"
+        ring.Rate = 150
+        ring.Lifetime = NumberRange.new(0.4, 0.7)
+        ring.Speed = NumberRange.new(10 + i * 5, 20 + i * 5)
+        ring.SpreadAngle = Vector2.new(0, 0)
+        ring.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+        }
+        ring.Size = NumberSequence.new{
+            NumberSequenceKeypoint.new(0, 0.6),
+            NumberSequenceKeypoint.new(1, 0)
+        }
+        ring.LightEmission = 1
+        ring:Emit(20)
+    end
+    
+    local flash = Instance.new("PointLight", effectPart)
+    flash.Color = Color3.fromRGB(0, 200, 255)
+    flash.Range = 20
+    flash.Brightness = 5
+    TweenService:Create(flash, TweenInfo.new(0.5), {Brightness = 0}):Play()
     
     Debris:AddItem(effectPart, 1.5)
 end
@@ -264,19 +336,19 @@ local function createLandingEffect(char)
     
     local dust = Instance.new("ParticleEmitter", effectPart)
     dust.Texture = "rbxassetid://77302218896291"
-    dust.Rate = 250
+    dust.Rate = 300
     dust.Lifetime = NumberRange.new(0.3, 0.6)
-    dust.Speed = NumberRange.new(8, 15)
+    dust.Speed = NumberRange.new(10, 20)
     dust.SpreadAngle = Vector2.new(360, 360)
     dust.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 200, 200)),
         ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 100, 100))
     }
     dust.Size = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.6),
+        NumberSequenceKeypoint.new(0, 0.7),
         NumberSequenceKeypoint.new(1, 0)
     }
-    dust:Emit(50)
+    dust:Emit(60)
     
     Debris:AddItem(effectPart, 1)
 end
@@ -342,6 +414,7 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
         
         createTakeoffEffect(char)
         createFlyTrail(char)
+        createBodyAura(char)
         if flyParticles then flyParticles.Enabled = true end
         
         originalCameraSubject = camera.CameraSubject
@@ -367,34 +440,34 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
         legSwingConnection = RunService.RenderStepped:Connect(function(deltaTime)
             if not flying or not char or not char.Parent then return end
             
-            legTime = legTime + deltaTime * 8
+            legTime = legTime + deltaTime * 10
             
             local speed = tonumber(SpeedInput.Text) or 200
             
             if hum.MoveDirection.Magnitude > 0 then
-                local flyDir = (hum.MoveDirection + Vector3.new(0, camera.CFrame.LookVector.Y * 1.5, 0)).Unit
-                bv.Velocity = bv.Velocity:Lerp(flyDir * speed, 0.1)
+                local flyDir = (hum.MoveDirection + Vector3.new(0, camera.CFrame.LookVector.Y * 1.8, 0)).Unit
+                bv.Velocity = bv.Velocity:Lerp(flyDir * speed, 0.12)
                 
                 if bv.Velocity.Magnitude > 1 then
                     local lookDir = bv.Velocity.Unit
-                    bg.CFrame = CFrame.new(root.Position, root.Position + lookDir) * CFrame.Angles(math.rad(-60), 0, 0)
+                    bg.CFrame = CFrame.new(root.Position, root.Position + lookDir) * CFrame.Angles(math.rad(-65), 0, 0)
                 end
                 
                 if flyParticles then
-                    flyParticles.Rate = 100
-                    flyParticles.Speed = NumberRange.new(5, 10)
+                    flyParticles.Rate = 120
+                    flyParticles.Speed = NumberRange.new(6, 12)
                 end
             else
-                bv.Velocity = bv.Velocity:Lerp(Vector3.zero, 0.08)
+                bv.Velocity = bv.Velocity:Lerp(Vector3.zero, 0.1)
                 
                 local lookDir = camera.CFrame.LookVector * Vector3.new(1, 0, 1)
                 if lookDir.Magnitude > 0 then
-                    bg.CFrame = bg.CFrame:Lerp(CFrame.new(root.Position, root.Position + lookDir), 0.08)
+                    bg.CFrame = bg.CFrame:Lerp(CFrame.new(root.Position, root.Position + lookDir), 0.1)
                 end
                 
                 if flyParticles then
-                    flyParticles.Rate = 40
-                    flyParticles.Speed = NumberRange.new(2, 4)
+                    flyParticles.Rate = 50
+                    flyParticles.Speed = NumberRange.new(3, 5)
                 end
             end
             
@@ -408,25 +481,28 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
                 local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
                 local torso = char:FindFirstChild("UpperTorso") and char.UpperTorso:FindFirstChild("Waist")
                 
-                if bv.Velocity.Magnitude > 10 then
-                    local legSwing = math.sin(legTime) * 25
-                    local armSwing = math.sin(legTime) * 10
+                if bv.Velocity.Magnitude > 5 then
+                    local legSwing = math.sin(legTime) * 35
+                    local armSwing = math.sin(legTime) * 8
                     
-                    if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15 + legSwing), 0, math.rad(-5)), 0.15) end
-                    if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15 - legSwing), 0, math.rad(5)), 0.15) end
-                    if rL then rL.C1 = rL.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(math.abs(legSwing) * 0.3), 0, 0), 0.15) end
-                    if lL then lL.C1 = lL.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(math.abs(legSwing) * 0.3), 0, 0), 0.15) end
+                    if rH then rH.C1 = CFrame.new(0, -0.5, 0.1) * CFrame.Angles(math.rad(-20 + legSwing), 0, math.rad(-3)) end
+                    if lH then lH.C1 = CFrame.new(0, -0.5, 0.1) * CFrame.Angles(math.rad(-20 - legSwing), 0, math.rad(3)) end
+                    if rL then rL.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(math.abs(legSwing) * 0.4), 0, 0) end
+                    if lL then lL.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(math.abs(legSwing) * 0.4), 0, 0) end
                     
-                    if rS then rS.C1 = rS.C1:Lerp(CFrame.new(0.2, 0.6, -0.2) * CFrame.Angles(math.rad(-150 + armSwing), math.rad(10), math.rad(-25)), 0.1) end
-                    if lS then lS.C1 = lS.C1:Lerp(CFrame.new(-0.2, 0.6, -0.2) * CFrame.Angles(math.rad(-150 - armSwing), math.rad(-10), math.rad(25)), 0.1) end
-                    if neck then neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.3, 0.1) * CFrame.Angles(math.rad(-30), 0, 0), 0.1) end
-                    if torso then torso.C1 = torso.C1:Lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-20), 0, 0), 0.1) end
+                    if rS then rS.C1 = CFrame.new(0.2, 0.7, -0.3) * CFrame.Angles(math.rad(-160 + armSwing), math.rad(15), math.rad(-30)) end
+                    if lS then lS.C1 = CFrame.new(-0.2, 0.7, -0.3) * CFrame.Angles(math.rad(-160 - armSwing), math.rad(-15), math.rad(30)) end
+                    if neck then neck.C1 = CFrame.new(0, -0.4, 0.2) * CFrame.Angles(math.rad(-35), 0, 0) end
+                    if torso then torso.C1 = CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-25), 0, 0) end
                 else
-                    if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-5), 0, 0), 0.1) end
-                    if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-5), 0, 0), 0.1) end
-                    if rS then rS.C1 = rS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(-15)), 0.1) end
-                    if lS then lS.C1 = lS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(15)), 0.1) end
-                    if neck then neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.2, 0) * CFrame.Angles(math.rad(-15), 0, 0), 0.1) end
+                    if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-10), 0, 0), 0.1) end
+                    if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-10), 0, 0), 0.1) end
+                    if rL then rL.C1 = rL.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0), 0.1) end
+                    if lL then lL.C1 = lL.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0), 0.1) end
+                    if rS then rS.C1 = rS.C1:Lerp(CFrame.new(0, 0.6, 0) * CFrame.Angles(math.rad(-15), 0, math.rad(-20)), 0.1) end
+                    if lS then lS.C1 = lS.C1:Lerp(CFrame.new(0, 0.6, 0) * CFrame.Angles(math.rad(-15), 0, math.rad(20)), 0.1) end
+                    if neck then neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-20), 0, 0), 0.1) end
+                    if torso then torso.C1 = torso.C1:Lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-10), 0, 0), 0.1) end
                 end
             else
                 local rH = char:FindFirstChild("Right Hip")
@@ -435,14 +511,14 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
                 local lS = char:FindFirstChild("Left Shoulder")
                 local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
                 
-                if bv.Velocity.Magnitude > 10 then
-                    local legSwing = math.sin(legTime) * 20
+                if bv.Velocity.Magnitude > 5 then
+                    local legSwing = math.sin(legTime) * 30
                     
-                    if rH then rH.C1 = rH.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10 + legSwing), 0, 0), 0.15) end
-                    if lH then lH.C1 = lH.C1:Lerp(CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-10 - legSwing), 0, 0), 0.15) end
-                    if rS then rS.C1 = rS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-150), 0, math.rad(-20)), 0.1) end
-                    if lS then lS.C1 = lS.C1:Lerp(CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-150), 0, math.rad(20)), 0.1) end
-                    if neck then neck.C1 = neck.C1:Lerp(CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-30), 0, 0), 0.1) end
+                    if rH then rH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-15 + legSwing), 0, 0) end
+                    if lH then lH.C1 = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(-15 - legSwing), 0, 0) end
+                    if rS then rS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-160), 0, math.rad(-25)) end
+                    if lS then lS.C1 = CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-160), 0, math.rad(25)) end
+                    if neck then neck.C1 = CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-35), 0, 0) end
                 end
             end
         end)
@@ -463,6 +539,11 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
                 flyParticles.Enabled = false
                 flyParticles:Destroy()
                 flyParticles = nil
+            end
+            
+            if bodyAura then
+                bodyAura:Destroy()
+                bodyAura = nil
             end
         end)
     else
@@ -487,6 +568,11 @@ ToggleFlyBtn.MouseButton1Click:Connect(function()
         if flyParticles then 
             flyParticles.Enabled = false
         end
+        
+        if bodyAura then
+            bodyAura:Destroy()
+            bodyAura = nil
+        end
     end
 end)
 
@@ -508,6 +594,11 @@ player.CharacterAdded:Connect(function(char)
         if flyParticles then 
             flyParticles:Destroy()
             flyParticles = nil
+        end
+        
+        if bodyAura then
+            bodyAura:Destroy()
+            bodyAura = nil
         end
     end
 end)
