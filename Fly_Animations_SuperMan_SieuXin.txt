@@ -1,0 +1,543 @@
+local uiName = "BastaFly_Ultimate"
+local pGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+if pGui:FindFirstChild(uiName) then pGui[uiName]:Destroy() end
+
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local flying = false
+local flyParticles = nil
+local defaultFOV = 70
+local flyingFOV = 90
+local zoomTween = nil
+local cameraOffset = Vector3.new(0, 0, 0)
+local defaultCameraOffset = Vector3.new(0, 0, 0)
+
+local ScreenGui = Instance.new("ScreenGui", pGui)
+ScreenGui.Name = uiName
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -110)
+MainFrame.Size = UDim2.new(0, 220, 0, 200)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.BackgroundTransparency = 0.15
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BorderSizePixel = 0
+
+local mainCorner = Instance.new("UICorner", MainFrame)
+mainCorner.CornerRadius = UDim.new(0, 20)
+
+local mainGradient = Instance.new("UIGradient", MainFrame)
+mainGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 20, 40)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(20, 15, 35)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 10, 30))
+}
+mainGradient.Rotation = 135
+
+local mainStroke = Instance.new("UIStroke", MainFrame)
+mainStroke.Color = Color3.fromRGB(150, 0, 255)
+mainStroke.Thickness = 2.5
+mainStroke.Transparency = 0.3
+
+task.spawn(function()
+    while MainFrame.Parent do
+        for _, t in ipairs({0.3, 1}) do
+            local tween = TweenService:Create(mainStroke, 
+                TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+                {Transparency = t}
+            )
+            tween:Play()
+            tween.Completed:Wait()
+        end
+    end
+end)
+
+MainFrame.Size = UDim2.new(0, 0, 0, 0)
+MainFrame.BackgroundTransparency = 1
+TweenService:Create(MainFrame, 
+    TweenInfo.new(0.6, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out),
+    {Size = UDim2.new(0, 220, 0, 200), BackgroundTransparency = 0.15}
+):Play()
+
+local LogoFrame = Instance.new("Frame", MainFrame)
+LogoFrame.Size = UDim2.new(1, 0, 0, 55)
+LogoFrame.BackgroundTransparency = 1
+
+local Title = Instance.new("TextLabel", LogoFrame)
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Text = "⚡ BASTAFly! ⚡"
+Title.TextColor3 = Color3.fromRGB(255, 200, 0)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 26
+Title.TextStrokeTransparency = 0.6
+Title.TextStrokeColor3 = Color3.fromRGB(255, 100, 0)
+
+task.spawn(function()
+    while Title.Parent do
+        local hue = (tick() * 0.3) % 1
+        Title.TextColor3 = Color3.fromHSV(hue, 0.9, 1)
+        mainStroke.Color = Color3.fromHSV(hue, 0.9, 1)
+        
+        TweenService:Create(Title, TweenInfo.new(0.8, Enum.EasingStyle.Sine), 
+            {TextSize = 27}):Play()
+        task.wait(0.4)
+        TweenService:Create(Title, TweenInfo.new(0.8, Enum.EasingStyle.Sine), 
+            {TextSize = 26}):Play()
+        task.wait(0.4)
+    end
+end)
+
+local SpeedInput = Instance.new("TextBox", MainFrame)
+SpeedInput.PlaceholderText = "💨 Tốc độ bay..."
+SpeedInput.Position = UDim2.new(0.1, 0, 0.3, 0)
+SpeedInput.Size = UDim2.new(0.8, 0, 0, 38)
+SpeedInput.Text = "200"
+SpeedInput.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+SpeedInput.TextColor3 = Color3.fromRGB(200, 230, 255)
+SpeedInput.Font = Enum.Font.GothamSemibold
+SpeedInput.TextSize = 15
+SpeedInput.ClearTextOnFocus = false
+SpeedInput.BorderSizePixel = 0
+
+local inputCorner = Instance.new("UICorner", SpeedInput)
+inputCorner.CornerRadius = UDim.new(0, 10)
+
+local inputStroke = Instance.new("UIStroke", SpeedInput)
+inputStroke.Color = Color3.fromRGB(100, 150, 255)
+inputStroke.Thickness = 1.5
+inputStroke.Transparency = 0.7
+
+SpeedInput.Focused:Connect(function()
+    TweenService:Create(inputStroke, TweenInfo.new(0.3), {Transparency = 0, Thickness = 2.5}):Play()
+    TweenService:Create(SpeedInput, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(35, 35, 60)}):Play()
+end)
+
+SpeedInput.FocusLost:Connect(function()
+    TweenService:Create(inputStroke, TweenInfo.new(0.3), {Transparency = 0.7, Thickness = 1.5}):Play()
+    TweenService:Create(SpeedInput, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(25, 25, 45)}):Play()
+end)
+
+local ToggleFlyBtn = Instance.new("TextButton", MainFrame)
+ToggleFlyBtn.Position = UDim2.new(0.1, 0, 0.58, 0)
+ToggleFlyBtn.Size = UDim2.new(0.8, 0, 0, 48)
+ToggleFlyBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
+ToggleFlyBtn.Text = "🚀 KÍCH HOẠT BAY"
+ToggleFlyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleFlyBtn.Font = Enum.Font.GothamBold
+ToggleFlyBtn.TextSize = 17
+ToggleFlyBtn.AutoButtonColor = false
+ToggleFlyBtn.BorderSizePixel = 0
+
+local flyCorner = Instance.new("UICorner", ToggleFlyBtn)
+flyCorner.CornerRadius = UDim.new(0, 12)
+
+local flyGradient = Instance.new("UIGradient", ToggleFlyBtn)
+flyGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 120, 255))
+}
+
+local flyStroke = Instance.new("UIStroke", ToggleFlyBtn)
+flyStroke.Color = Color3.fromRGB(150, 220, 255)
+flyStroke.Thickness = 2
+flyStroke.Transparency = 0.5
+
+ToggleFlyBtn.MouseEnter:Connect(function()
+    TweenService:Create(ToggleFlyBtn, TweenInfo.new(0.2), {Size = UDim2.new(0.84, 0, 0, 50)}):Play()
+    TweenService:Create(flyStroke, TweenInfo.new(0.2), {Transparency = 0, Thickness = 3}):Play()
+end)
+
+ToggleFlyBtn.MouseLeave:Connect(function()
+    TweenService:Create(ToggleFlyBtn, TweenInfo.new(0.2), {Size = UDim2.new(0.8, 0, 0, 48)}):Play()
+    TweenService:Create(flyStroke, TweenInfo.new(0.2), {Transparency = 0.5, Thickness = 2}):Play()
+end)
+
+local Credits = Instance.new("TextLabel", MainFrame)
+Credits.Size = UDim2.new(1, 0, 0, 20)
+Credits.Position = UDim2.new(0, 0, 0.85, 0)
+Credits.Text = "⚡ Ultimate Edition ⚡"
+Credits.TextColor3 = Color3.fromRGB(150, 150, 200)
+Credits.BackgroundTransparency = 1
+Credits.Font = Enum.Font.Gotham
+Credits.TextSize = 11
+
+local function smoothCameraZoom(targetFOV, speed)
+    if zoomTween then
+        zoomTween:Cancel()
+    end
+    
+    local currentFOV = camera.FieldOfView
+    local diff = targetFOV - currentFOV
+    
+    zoomTween = TweenService:Create(camera, 
+        TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {FieldOfView = targetFOV}
+    )
+    zoomTween:Play()
+    
+    zoomTween.Completed:Connect(function()
+        zoomTween = nil
+    end)
+end
+
+local function smoothCameraOffset(targetOffset, speed)
+    local currentOffset = cameraOffset
+    local diff = targetOffset - currentOffset
+    
+    local startTime = tick()
+    local duration = 0.4
+    
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        local elapsed = tick() - startTime
+        local alpha = math.min(elapsed / duration, 1)
+        
+        local easedAlpha = 1 - (1 - alpha) * (1 - alpha)
+        cameraOffset = currentOffset:Lerp(targetOffset, easedAlpha)
+        
+        if alpha >= 1 then
+            connection:Disconnect()
+        end
+    end)
+end
+
+local function createFlyTrail(char)
+    if flyParticles then 
+        flyParticles:Destroy() 
+        flyParticles = nil
+    end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    local attachment = Instance.new("Attachment", root)
+    attachment.Position = Vector3.new(0, -1, 0)
+    
+    flyParticles = Instance.new("ParticleEmitter", attachment)
+    flyParticles.Texture = "rbxassetid://77302218896291"
+    flyParticles.Rate = 80
+    flyParticles.Lifetime = NumberRange.new(0.6, 1.2)
+    flyParticles.Speed = NumberRange.new(3, 6)
+    flyParticles.SpreadAngle = Vector2.new(25, 25)
+    flyParticles.VelocityInheritance = 0.4
+    flyParticles.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 0, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 150))
+    }
+    flyParticles.Size = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.4),
+        NumberSequenceKeypoint.new(0.5, 0.2),
+        NumberSequenceKeypoint.new(1, 0)
+    }
+    flyParticles.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.4),
+        NumberSequenceKeypoint.new(1, 1)
+    }
+    flyParticles.LightEmission = 1
+    flyParticles.LightInfluence = 0
+    flyParticles.ZOffset = 0
+    flyParticles.Enabled = false
+    flyParticles.Acceleration = Vector3.new(0, -2, 0)
+    flyParticles.Drag = 1
+end
+
+local function createTakeoffEffect(char)
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    local effectPart = Instance.new("Part")
+    effectPart.Size = Vector3.new(1, 1, 1)
+    effectPart.Position = root.Position
+    effectPart.Anchored = true
+    effectPart.CanCollide = false
+    effectPart.Transparency = 1
+    effectPart.Parent = workspace
+    
+    local ring = Instance.new("ParticleEmitter", effectPart)
+    ring.Texture = "rbxassetid://77302218896291"
+    ring.Rate = 200
+    ring.Lifetime = NumberRange.new(0.5, 0.8)
+    ring.Speed = NumberRange.new(15, 25)
+    ring.SpreadAngle = Vector2.new(0, 0)
+    ring.VelocityInheritance = 0
+    ring.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+    }
+    ring.Size = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.8),
+        NumberSequenceKeypoint.new(1, 0)
+    }
+    ring.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.5),
+        NumberSequenceKeypoint.new(1, 1)
+    }
+    ring.LightEmission = 1
+    ring:Emit(30)
+    
+    local upward = Instance.new("ParticleEmitter", effectPart)
+    upward.Texture = "rbxassetid://77302218896291"
+    upward.Rate = 150
+    upward.Lifetime = NumberRange.new(0.8, 1.2)
+    upward.Speed = NumberRange.new(10, 20)
+    upward.SpreadAngle = Vector2.new(360, 360)
+    upward.VelocityInheritance = 0
+    upward.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 0, 255))
+    }
+    upward.Size = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.5),
+        NumberSequenceKeypoint.new(1, 0)
+    }
+    upward.LightEmission = 1
+    upward:Emit(40)
+    
+    game:GetService("Debris"):AddItem(effectPart, 1.5)
+end
+
+local function createLandingEffect(char)
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    local effectPart = Instance.new("Part")
+    effectPart.Size = Vector3.new(1, 1, 1)
+    effectPart.Position = root.Position - Vector3.new(0, 2, 0)
+    effectPart.Anchored = true
+    effectPart.CanCollide = false
+    effectPart.Transparency = 1
+    effectPart.Parent = workspace
+    
+    local dust = Instance.new("ParticleEmitter", effectPart)
+    dust.Texture = "rbxassetid://77302218896291"
+    dust.Rate = 300
+    dust.Lifetime = NumberRange.new(0.4, 0.7)
+    dust.Speed = NumberRange.new(8, 15)
+    dust.SpreadAngle = Vector2.new(180, 180)
+    dust.VelocityInheritance = 0
+    dust.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 200, 200)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 100, 100))
+    }
+    dust.Size = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.6),
+        NumberSequenceKeypoint.new(1, 0)
+    }
+    dust.LightEmission = 0.5
+    dust:Emit(50)
+    
+    game:GetService("Debris"):AddItem(effectPart, 1)
+end
+
+local function setR15Pose(char, mode, alpha)
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    
+    if hum.RigType == Enum.HumanoidRigType.R15 then
+        local rS = char:FindFirstChild("RightUpperArm") and char.RightUpperArm:FindFirstChild("RightShoulder")
+        local lS = char:FindFirstChild("LeftUpperArm") and char.LeftUpperArm:FindFirstChild("LeftShoulder")
+        local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
+        local rH = char:FindFirstChild("RightUpperLeg") and char.RightUpperLeg:FindFirstChild("RightHip")
+        local lH = char:FindFirstChild("LeftUpperLeg") and char.LeftUpperLeg:FindFirstChild("LeftHip")
+        local torso = char:FindFirstChild("UpperTorso") and char.UpperTorso:FindFirstChild("Waist")
+        
+        if rS and lS and neck then
+            local tRS, tLS, tN, tRH, tLH, tTorso
+            
+            if mode == "Flying" then
+                tRS = CFrame.new(0.2, 0.8, -0.2) * CFrame.Angles(math.rad(-150), math.rad(10), math.rad(-30))
+                tLS = CFrame.new(-0.2, 0.8, -0.2) * CFrame.Angles(math.rad(-150), math.rad(-10), math.rad(30))
+                tN = CFrame.new(0, -0.4, 0.1) * CFrame.Angles(math.rad(-40), 0, 0)
+                if rH then tRH = CFrame.new(0, -0.4, 0.1) * CFrame.Angles(math.rad(-20), 0, math.rad(-5)) end
+                if lH then tLH = CFrame.new(0, -0.4, 0.1) * CFrame.Angles(math.rad(-20), 0, math.rad(5)) end
+                if torso then tTorso = CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-30), 0, 0) end
+            elseif mode == "Hover" then
+                tRS = CFrame.new(0, 0.6, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(-15))
+                tLS = CFrame.new(0, 0.6, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(15))
+                tN = CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-15), 0, 0)
+                if rH then tRH = CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-10), 0, 0) end
+                if lH then tLH = CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-10), 0, 0) end
+            else
+                tRS = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(-25))
+                tLS = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(25))
+                tN = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0)
+                if rH then tRH = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
+                if lH then tLH = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0) end
+                if torso then tTorso = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0) end
+            end
+            
+            rS.C1 = rS.C1:Lerp(tRS, alpha)
+            lS.C1 = lS.C1:Lerp(tLS, alpha)
+            neck.C1 = neck.C1:Lerp(tN, alpha)
+            if rH and tRH then rH.C1 = rH.C1:Lerp(tRH, alpha) end
+            if lH and tLH then lH.C1 = lH.C1:Lerp(tLH, alpha) end
+            if torso and tTorso then torso.C1 = torso.C1:Lerp(tTorso, alpha) end
+        end
+    else
+        local rS = char:FindFirstChild("Right Shoulder")
+        local lS = char:FindFirstChild("Left Shoulder")
+        local neck = char:FindFirstChild("Head") and char.Head:FindFirstChild("Neck")
+        
+        if rS and lS and neck then
+            local tRS, tLS, tN
+            
+            if mode == "Flying" then
+                tRS = CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-150), 0, math.rad(-20))
+                tLS = CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-150), 0, math.rad(20))
+                tN = CFrame.new(0, -0.3, 0) * CFrame.Angles(math.rad(-40), 0, 0)
+            elseif mode == "Hover" then
+                tRS = CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(-15))
+                tLS = CFrame.new(0, 0.5, 0) * CFrame.Angles(math.rad(-10), 0, math.rad(15))
+                tN = CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15), 0, 0)
+            else
+                tRS = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(-25))
+                tLS = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(25))
+                tN = CFrame.new(0, -0.5, 0) * CFrame.Angles(0, 0, 0)
+            end
+            
+            rS.C1 = rS.C1:Lerp(tRS, alpha)
+            lS.C1 = lS.C1:Lerp(tLS, alpha)
+            neck.C1 = neck.C1:Lerp(tN, alpha)
+        end
+    end
+end
+
+ToggleFlyBtn.MouseButton1Click:Connect(function()
+    flying = not flying
+    local char = player.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not root or not hum then return end
+    
+    if flying then
+        ToggleFlyBtn.Text = "🛬 DỪNG BAY"
+        flyGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 100, 0)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 0))
+        }
+        
+        createTakeoffEffect(char)
+        createFlyTrail(char)
+        if flyParticles then flyParticles.Enabled = true end
+        
+        smoothCameraZoom(flyingFOV, 0.5)
+        smoothCameraOffset(Vector3.new(0, 0, -3), 0.4)
+        
+        local bg = Instance.new("BodyGyro", root)
+        bg.P = 9e4
+        bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bg.D = 500
+        
+        local bv = Instance.new("BodyVelocity", root)
+        bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        bv.P = 1000
+        
+        hum.PlatformStand = true
+        
+        local poseAlpha = 0
+        
+        task.spawn(function()
+            while flying and char.Parent do
+                RunService.RenderStepped:Wait()
+                local speed = tonumber(SpeedInput.Text) or 200
+                
+                poseAlpha = math.min(poseAlpha + 0.05, 1)
+                
+                if hum.MoveDirection.Magnitude > 0 then
+                    local flyDir = (hum.MoveDirection + Vector3.new(0, camera.CFrame.LookVector.Y * 1.5, 0)).Unit
+                    bv.Velocity = bv.Velocity:Lerp(flyDir * speed, 0.12)
+                    
+                    local lookDir = bv.Velocity.Unit
+                    if lookDir.Magnitude > 0 then
+                        bg.CFrame = CFrame.new(root.Position, root.Position + lookDir) * CFrame.Angles(math.rad(-70), 0, 0)
+                    end
+                    
+                    setR15Pose(char, "Flying", poseAlpha)
+                    
+                    if flyParticles then
+                        flyParticles.Speed = NumberRange.new(4, 8)
+                        flyParticles.Rate = 100
+                    end
+                else
+                    bv.Velocity = bv.Velocity:Lerp(Vector3.zero, 0.1)
+                    
+                    local lookDir = camera.CFrame.LookVector * Vector3.new(1, 0, 1)
+                    if lookDir.Magnitude > 0 then
+                        bg.CFrame = bg.CFrame:Lerp(CFrame.new(root.Position, root.Position + lookDir), 0.1)
+                    end
+                    
+                    setR15Pose(char, "Hover", poseAlpha)
+                    
+                    if flyParticles then
+                        flyParticles.Speed = NumberRange.new(2, 4)
+                        flyParticles.Rate = 50
+                    end
+                end
+            end
+            
+            bg:Destroy()
+            bv:Destroy()
+            hum.PlatformStand = false
+            
+            local resetPoseAlpha = 0.3
+            local resetConnection
+            resetConnection = RunService.RenderStepped:Connect(function()
+                resetPoseAlpha = resetPoseAlpha - 0.02
+                if resetPoseAlpha <= 0 then
+                    setR15Pose(char, "Normal", 0)
+                    resetConnection:Disconnect()
+                else
+                    setR15Pose(char, "Hover", resetPoseAlpha)
+                end
+            end)
+            
+            if flyParticles then 
+                flyParticles.Enabled = false
+                flyParticles:Destroy()
+                flyParticles = nil
+            end
+        end)
+    else
+        ToggleFlyBtn.Text = "🚀 KÍCH HOẠT BAY"
+        flyGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 120, 255))
+        }
+        
+        createLandingEffect(char)
+        
+        smoothCameraZoom(defaultFOV, 0.5)
+        smoothCameraOffset(defaultCameraOffset, 0.4)
+        
+        if flyParticles then 
+            flyParticles.Enabled = false
+        end
+    end
+end)
+
+player.CharacterAdded:Connect(function(char)
+    if flying then
+        flying = false
+        ToggleFlyBtn.Text = "🚀 KÍCH HOẠT BAY"
+        flyGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 120, 255))
+        }
+        smoothCameraZoom(defaultFOV, 0.3)
+        smoothCameraOffset(defaultCameraOffset, 0.3)
+        if flyParticles then 
+            flyParticles:Destroy()
+            flyParticles = nil
+        end
+    end
+end)
