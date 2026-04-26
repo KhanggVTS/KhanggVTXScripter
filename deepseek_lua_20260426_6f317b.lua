@@ -190,7 +190,7 @@ end
 
 local function hashString(str, seed)
     local h = seed or 0x1505
-    for i = 1, #str do h = ((h << 5) - h + string.byte(str, i)) & 0x7FFFFFFF end
+    for i = 1, #str do h = bit.band(bit.lshift(h, 5) - h + string.byte(str, i), 0x7FFFFFFF) end
     return h
 end
 
@@ -206,9 +206,9 @@ local function serializeDouble(n)
     local mantissa = n / (2^exp) - 1; exp = exp + 1023
     local mantissaInt = 0
     for _ = 1, 52 do mantissa = mantissa * 2; mantissaInt = mantissaInt * 2; if mantissa >= 1 then mantissaInt = mantissaInt + 1; mantissa = mantissa - 1 end end
-    local high = (sign << 7) | ((exp >> 4) & 0x7F)
-    local mid = ((exp & 0x0F) << 4) | ((mantissaInt >> 48) & 0x0F)
-    return string.char(high, mid, (mantissaInt >> 40) & 0xFF, (mantissaInt >> 32) & 0xFF, (mantissaInt >> 24) & 0xFF, (mantissaInt >> 16) & 0xFF, (mantissaInt >> 8) & 0xFF, mantissaInt & 0xFF)
+    local high = bit.bor(bit.lshift(sign, 7), bit.band(bit.rshift(exp, 4), 0x7F))
+    local mid = bit.bor(bit.lshift(bit.band(exp, 0x0F), 4), bit.band(bit.rshift(mantissaInt, 48), 0x0F))
+    return string.char(high, mid, bit.band(bit.rshift(mantissaInt, 40), 0xFF), bit.band(bit.rshift(mantissaInt, 32), 0xFF), bit.band(bit.rshift(mantissaInt, 24), 0xFF), bit.band(bit.rshift(mantissaInt, 16), 0xFF), bit.band(bit.rshift(mantissaInt, 8), 0xFF), bit.band(mantissaInt, 0xFF))
 end
 
 -- ==================== CRYPTO ENGINE INFINITY ====================
@@ -996,8 +996,8 @@ end
 
 function BytecodeCompilerInfinity:serialize(compiled)
     local parts = {}; table.insert(parts, string.char(0x4C,0x42,0x43,0x06)); table.insert(parts, string.char(0x01))
-    local function pu32(n) return string.char(n&0xFF,bit.rshift(n,8)&0xFF,bit.rshift(n,16)&0xFF,bit.rshift(n,24)&0xFF) end
-    local function pu16(n) return string.char(n&0xFF,bit.rshift(n,8)&0xFF) end
+    local function pu32(n) return string.char(bit.band(n,0xFF),bit.band(bit.rshift(n,8),0xFF),bit.band(bit.rshift(n,16),0xFF),bit.band(bit.rshift(n,24),0xFF)) end
+    local function pu16(n) return string.char(bit.band(n,0xFF),bit.band(bit.rshift(n,8),0xFF)) end
     table.insert(parts, pu32(#compiled.bytecode)); table.insert(parts, pu16(compiled.maxRegisters)); table.insert(parts, pu16(#compiled.constants)); table.insert(parts, pu16(#compiled.prototypes))
     for _, c in ipairs(compiled.constants) do
         if type(c) == "number" then table.insert(parts, string.char(0x01)); table.insert(parts, serializeDouble(c))
@@ -1314,7 +1314,7 @@ local function quantumPush(stack, value, pc, entropy)
     local pos1 = ((bit.bxor(pc, entropy or 0) * 0x9E3779B9) + entropy) % 10000 + 1
     local pos2 = bit.bxor(pos1, entropy or 0)
     stack[pos1] = bit.bxor(value, bit.band(pos1, 0xFF))
-    stack[pos2] = bit.bxor(value ~ 0xFF, bit.band(pos2, 0xFF))
+    stack[pos2] = bit.bxor(bit.bxor(value, 0xFF), bit.band(pos2, 0xFF))
 end]]
     code = code .. [[
 local function heisenbergDispatch(opcode, pc, handlers)
@@ -1646,7 +1646,7 @@ end
         local h_JMP = function(pc) local o = currentData[pc+1]; if o >= 0x80 then o = o - 0x100 end; return pc + o end
         local h_JMP_FALSE = function(pc) local c = hiddenPop(pc); local o = currentData[pc+1]; if o >= 0x80 then o = o - 0x100 end; if not c then return pc + o else return pc + 2 end end
         local h_PUSH_INT8 = function(pc) hiddenPush(currentData[pc+1], pc); return pc + 2 end
-        local h_PUSH_INT16 = function(pc) local v = currentData[pc+1] | (currentData[pc+2] << 8); if v >= 0x8000 then v = v - 0x10000 end; hiddenPush(v, pc); return pc + 3 end
+        local h_PUSH_INT16 = function(pc) local v = bit.bor(currentData[pc+1], bit.lshift(currentData[pc+2], 8)); if v >= 0x8000 then v = v - 0x10000 end; hiddenPush(v, pc); return pc + 3 end
         local h_CALL = function(pc) local n = currentData[pc+1]; local a = {}; for i=n,1,-1 do a[i] = hiddenPop(pc) end; local f = hiddenPop(pc); local r = {f(table.unpack(a,1,n))}; for _,v in ipairs(r) do hiddenPush(v, pc) end; return pc + 2 end
         local h_RETURN_N = function(pc) local n = currentData[pc+1]; local r = {}; for i=n,1,-1 do r[i] = hiddenPop(pc) end; return "RETURN", table.unpack(r) end
         local h_POP = function(pc) hiddenPop(pc); return pc + 1 end
