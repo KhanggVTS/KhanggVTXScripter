@@ -5,30 +5,93 @@
 local AegisPrimeInfinity = {}
 AegisPrimeInfinity.__index = AegisPrimeInfinity
 
--- ==================== BIT32 POLYFILL HOÀN CHỈNH (FIX #2) ====================
+-- ==================== BIT32 POLYFILL LUA 5.1 (DELTA COMPATIBLE) ====================
 local bit = bit32 or {}
+
 if not bit.bxor then bit.bxor = function(a, b)
     local r = 0
     for i = 0, 31 do
-        local bit_a = math.floor(a / (2 ^ i)) % 2
-        local bit_b = math.floor(b / (2 ^ i)) % 2
-        if bit_a ~= bit_b then r = r + (2 ^ i) end
+        local ba = math.floor(a / (2 ^ i)) % 2
+        local bb = math.floor(b / (2 ^ i)) % 2
+        if ba ~= bb then r = r + (2 ^ i) end
     end
     return r
 end end
-if not bit.band then bit.band = function(a, b) return a & b end end
-if not bit.bor then bit.bor = function(a, b) return a | b end end
-if not bit.bnot then bit.bnot = function(a) return ~a end end
-if not bit.lshift then bit.lshift = function(a, b) if b <= 0 then return a end; return math.floor(a * (2 ^ b)) end end
-if not bit.rshift then bit.rshift = function(a, b) if b <= 0 then return a end; return math.floor(a / (2 ^ b)) end end
-if not bit.arshift then bit.arshift = function(a, b) if b <= 0 then return a end; local sign = a < 0 and -1 or 1; return sign * math.floor(math.abs(a) / (2 ^ b)) end end
-if not bit.rol then bit.rol = function(a, b) b = b % 32; return bit.bor(bit.lshift(a, b), bit.rshift(a, 32 - b)) end end
-if not bit.ror then bit.ror = function(a, b) b = b % 32; return bit.bor(bit.rshift(a, b), bit.lshift(a, 32 - b)) end end
-if not bit.tobit then bit.tobit = function(a) return bit.band(a, 0xFFFFFFFF) end end
-if not bit.tohex then bit.tohex = function(a, n) return string.format("%0" .. (n or 8) .. "X", bit.band(a, 0xFFFFFFFF)) end end
-if not bit.bswap then bit.bswap = function(a) return bit.bor(bit.bor(bit.bor(bit.lshift(bit.band(a, 0xFF), 24), bit.lshift(bit.band(bit.rshift(a, 8), 0xFF), 16)), bit.lshift(bit.band(bit.rshift(a, 16), 0xFF), 8)), bit.band(bit.rshift(a, 24), 0xFF)) end end
-if not bit.btest then bit.btest = function(a, b) return bit.band(a, b) ~= 0 end end
-if not bit.extract then bit.extract = function(a, f, w) return bit.band(bit.rshift(a, f), (1 << w) - 1) end end
+
+if not bit.band then bit.band = function(a, b)
+    local r = 0
+    for i = 0, 31 do
+        local ba = math.floor(a / (2 ^ i)) % 2
+        local bb = math.floor(b / (2 ^ i)) % 2
+        if ba == 1 and bb == 1 then r = r + (2 ^ i) end
+    end
+    return r
+end end
+
+if not bit.bor then bit.bor = function(a, b)
+    local r = 0
+    for i = 0, 31 do
+        local ba = math.floor(a / (2 ^ i)) % 2
+        local bb = math.floor(b / (2 ^ i)) % 2
+        if ba == 1 or bb == 1 then r = r + (2 ^ i) end
+    end
+    return r
+end end
+
+if not bit.bnot then bit.bnot = function(a)
+    return bit.bxor(a, 0xFFFFFFFF)
+end end
+
+if not bit.lshift then bit.lshift = function(a, b)
+    if b <= 0 then return a end
+    return math.floor(a * (2 ^ b)) % 4294967296
+end end
+
+if not bit.rshift then bit.rshift = function(a, b)
+    if b <= 0 then return a end
+    return math.floor(a / (2 ^ b))
+end end
+
+if not bit.arshift then bit.arshift = function(a, b)
+    if b <= 0 then return a end
+    local sign = 1
+    if a < 0 then sign = -1 end
+    return sign * math.floor(math.abs(a) / (2 ^ b))
+end end
+
+if not bit.rol then bit.rol = function(a, b)
+    b = b % 32
+    return bit.bor(bit.lshift(a, b), bit.rshift(a, 32 - b))
+end end
+
+if not bit.ror then bit.ror = function(a, b)
+    b = b % 32
+    return bit.bor(bit.rshift(a, b), bit.lshift(a, 32 - b))
+end end
+
+if not bit.tobit then bit.tobit = function(a)
+    return bit.band(a, 0xFFFFFFFF)
+end end
+
+if not bit.tohex then bit.tohex = function(a, n)
+    return string.format("%0" .. (n or 8) .. "X", bit.band(a, 0xFFFFFFFF))
+end end
+
+if not bit.bswap then bit.bswap = function(a)
+    local b1 = bit.lshift(bit.band(a, 0xFF), 24)
+    local b2 = bit.lshift(bit.band(bit.rshift(a, 8), 0xFF), 16)
+    local b3 = bit.lshift(bit.band(bit.rshift(a, 16), 0xFF), 8)
+    local b4 = bit.band(bit.rshift(a, 24), 0xFF)
+    return bit.bor(bit.bor(bit.bor(b1, b2), b3), b4)
+end end
+
+if not bit.btest then bit.btest = function(a, b)
+    return bit.band(a, b) ~= 0
+end end
+
+if not bit.extract then bit.extract = function(a, f, w)
+    return bit.band(bit.rshift(a, f), (2 ^ w) - 1)
+end end
 
 -- ==================== SECURITY LEVELS ====================
 local SecurityLevel = { MAXIMUM = 10, EXTREME = 9, HIGH = 7, MEDIUM = 5, LOW = 3, MINIMAL = 1 }
