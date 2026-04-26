@@ -1738,5 +1738,4 @@ return {
     Config = Config,
     SecurityLevel = SecurityLevel,
     VERSION = "14.0 INFINITY FIXED - 8/8 COMPLETE",
-}Y FIXED - 8/8 COMPLETE",
 }
