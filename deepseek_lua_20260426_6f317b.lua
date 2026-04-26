@@ -1493,7 +1493,14 @@ return (function(...)
                 stackPosKeys[i] = bit.band(state, 0xFF)
             end
         end
-        
+        local masterKey = {}
+do
+    local state = masterSeed
+    for i = 1, 64 do
+        state = bit.bxor(state * 0x41C64E6D, bit.rshift(state, 13))
+        masterKey[i] = bit.band(state, 0xFF)
+    end
+end
         local function hiddenPush(value, pc)
             local pos = ((bit.bxor(pc, masterSeed) * 0x9E3779B9) + masterSeed) % stackMaxSize + 1
             if type(value) == "number" then
