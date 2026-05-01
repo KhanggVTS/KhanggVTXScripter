@@ -45,7 +45,7 @@ local function CreateCSPRNG(seed)
     local state = {
         s0 = (seed or (tick() * 1e7 % 0x100000000)),
         s1 = ((os.time() * 1337 + 0xDEADBEEF) % 0x100000000),
-        s2 = ((tick() * 1e9 % 0x100000000) ~ 0xA5A5A5A5),
+        s2 = bit32.bxor(math.floor(tick() * 1e9) % 0x100000000, 0xA5A5A5A5),
         s3 = 0x9E3779B9,
         counter = 0,
     }
