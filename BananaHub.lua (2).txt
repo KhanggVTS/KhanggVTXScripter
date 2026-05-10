@@ -2696,7 +2696,7 @@ local function ShootLoop()
     end
 end
 
-Library = loadstring(game:HttpGet("https://https://raw.githubusercontent.com/KhanggVTS/web-troll/refs/heads/main/t%E1%BA%A3i%20xu%E1%BB%91ng.txt"))()
+Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/KhanggVTS/web-troll/refs/heads/main/t%E1%BA%A3i%20xu%E1%BB%91ng.txt"))()
 
 Window = Library:CreateWindow({
     Title = "Axver Hub",
